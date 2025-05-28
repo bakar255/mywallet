@@ -1,0 +1,1 @@
+Un Portfeuille numérique qui peux stocker, envoyer, recevoir des cryptomonnaies sur la blockchain ethereum grâce a des contracts intelligents fournis d'un frontend sous react TS.
