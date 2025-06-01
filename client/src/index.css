@@ -37,7 +37,7 @@ h1 {
   line-height: 1.1;
 }
 
-button {
+.buttongreen {
   border-radius: 8px;
   border: 1px solid transparent;
   padding: 0.6em 1.2em;
@@ -48,11 +48,11 @@ button {
   cursor: pointer;
   transition: border-color 0.25s;
 }
-button:hover {
+.buttongreen:hover {
   border-color: #76ff64;
 }
-button:focus,
-button:focus-visible {
+.buttongreen:focus,
+.buttongreen:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
 }
 
@@ -64,12 +64,23 @@ button:focus-visible {
   a:hover {
     color: #747bff;
   }
-  button {
+  .buttongreen {
     background-color: #f9f9f9;
   }
 }
 
-.tailwind-button {
-  background-color: #1d4e1d; 
+
+.notif {
+ cursor: pointer;
 }
 
+.btnpanel{
+  color: beige;
+  background-color:gray;
+  cursor: pointer;
+  font-weight: 300;
+  padding: 0.6em 1.2em;
+  border-radius: 8px;
+
+  
+}
