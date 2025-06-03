@@ -14,6 +14,7 @@ const App: React.FC = () => {
   const [montant, setMontant] = useState<string>("")
   const [destinataire, setDestinataire] = useState<string>("")
   const [Ongletup, setOngletUp] = useState(false);
+  const [swapUp, setSwapUp] = useState(false);
     
 const getTransactions = async (adresse: string) => {
   try {
@@ -118,21 +119,53 @@ const getTransactions = async (adresse: string) => {
           className="bg-gray-500 hover:bg-gray-500 text-amber-100 px-3 py-1 rounded cursor-pointer"> 
           {estConnecte ? "Déconnecter" : "Connecter"}
         </button>
-        <button  className="bg-gray-500 hover:bg-gray-500 text-amber-100 px-3 py-1 rounded cursor-pointer">
-          Mywallet 
+        <button  className="bg-gray-500 hover:bg-gray-500 text-amber-100 px-3 py-1 rounded-lg cursor-pointer">
+          
+          Wallet 
         </button>
       </div>
     </div>
   </nav>
 
- <div className="mx-70 px-3 p-10 mt-10 rounded-lg shadow-md text-center bg-gray-800">
+ <div className="mx-70 px-3 p-10 mt-10 rounded-lg shadow-md text-center bg-gray-800 relative">
     <div className="text-center p-6 rounded-lg">
-        <div>
+       <div className='mb-7'>
+        <h2 className='text-4xl absolute left top-1 font-semibold text-gray-500'>Dashboard</h2>
          <span className="whitespace-nowrap text-4xl font-semibold leading-none">{solde}0.00$</span>
-        </div>
-        
+          </div>
 
-              <button className='btnpanel'>Swap</button>
+              <button onClick={() => setSwapUp(true)} className='btnpanel'>Swap
+              </button>
+
+             { swapUp && (
+              <div className='fixed inset-0 bg-opacity- 50 flex items-center justify-center z-50 '>
+              <div className='bg-black rounded-lg p-5 w-96 h-60 relative'>             
+                <h2 className=" font-bold">Swap</h2>
+               <div className='mb-4'>
+               <a className='font-semibold text-gray-500 leading-none flex whitespace-nowrap '> Pay: </a>
+                <input type="text" placeholder='0.00$' className=' border-gray-300 rounded px-3 py-2 bg-gray-700 text-white text-right'
+                />
+                <div className='flex justify-center'>
+                <button className='cursor-pointer' >
+                <img src="/swap.svg" alt="" className='w-10 h-10 inline-flex rounded-full'/>
+                </button>
+                </div>
+                </div>          
+                <div className='mb-4'>
+                <a className='font-semibold leading-none flex whitespace-nowrap'> Receive: </a>
+                <input type="text" placeholder='0.00$' 
+                className=' border-gray-300 p-4 rounded text-gray-500 mb-10 text-right py-2 px-3 bg-gray-700'
+                />
+                <button
+                onClick= {() => setSwapUp(false) } className='absolute top-2 right-2 text-1xl text-white'>
+                x
+                </button>
+                    
+                   </div>
+                </div>      
+             </div>
+              )}
+               
             <button
                 onClick={() => setOngletUp(true)}
                 className="btnpanel gap-4 mx-4"
@@ -141,11 +174,11 @@ const getTransactions = async (adresse: string) => {
             </button>
 
             {Ongletup && (
-              <div className="fixed inset-0 bg-gray-100 bg-opacity-50 flex items-center justify-center z-50">
-             <div className="bg-white rounded-xl p-6 w-96 shadow-xl relative">
+              <div className="fixed inset-0  bg-opacity-50 flex items-center justify-center z-50">
+             <div className="bg-black rounded-xl p-6 mx-auto shadow-xl relative">
                <h2 className="text-xl font-bold mb-4 text-gray-500">Envoyer des ETH</h2>
                 <div className="flex justify-center items-center space-x-2">                      <button onClick={envoyerETH}
-                  className="bg-gray-500 text-amber-100 px-4 py-2 rounded cursor-pointer" >
+                  className="bg-gray-500 px-4 py-2 rounded cursor-pointer" >
                      Envoyer
                      </button>
 
@@ -167,7 +200,7 @@ const getTransactions = async (adresse: string) => {
          onClick={() => setOngletUp(false)}
          className="absolute top-2 right-2 text-gray-500 hover:text-gray-800"
                  >
-              &times;
+         &times;
        </button>
        </div>
      </div>
@@ -175,23 +208,17 @@ const getTransactions = async (adresse: string) => {
             )}
         </div>
     </div>
-  
-    <div className=' bg-gray-900 rounded-lg mx-60'>
-    <h2 className='font semi-bold leading-none text-2xl'>Transactions : </h2>
-        <ul className="text-sm text-white space-y-2 max-h-48 overflow-y-auto">
+       <div className=' bg-gray-700 rounded-lg '>
+         <h2 className='font semi-bold leading-none text-2xl'>Transactions : </h2>
+         <ul className="text-sm text-white space-y-2 max-h-48 overflow-y-auto">
             {transactions.slice(0, 5).map(tx => (
-                <li key={tx.hash}>
-                    Vers : {tx.to.slice(0, 6)}… • {ethers.formatEther(tx.value)} ETH
-                </li>
+            <li key={tx.hash}>
+             Vers : {tx.to.slice(0, 6)}… • {ethers.formatEther(tx.value)} ETH
+            </li>
             ))}
         </ul>
         </div>
-</div>
-
-
-  
-      
-          
+     </div>          
 
      )}
 
