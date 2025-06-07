@@ -7,7 +7,7 @@
   font-weight: 400;
 
   color: rgba(255, 255, 255, 0.87);
-  background-color: #A29BFE; 
+  background-color: #aba6f4; 
   
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -16,19 +16,19 @@
 }
 
 body {
-  color: white;
+  
   margin: 0;
   display: flex;
   place-items: center;
   min-width: 320px;
   min-height: 100vh;
-  background-color: #3a3a4a; 
+  background-color: #454575; 
 }
 
 h1 {
   font-size: 3.2em;
   line-height: 1.1;
-  color: #1A1A1A; /* Couleur de texte pour le titre */
+  color: #ffffff; 
 }
 
 .buttongreen {
@@ -39,7 +39,7 @@ h1 {
   font-weight: 500;
   font-family: inherit;
   background-color: #1a8b16;
-  color: white; /* Couleur du texte du bouton */
+  color: white; 
   cursor: pointer;
   transition: border-color 0.25s;
 }
@@ -49,22 +49,50 @@ h1 {
 }
 
 .buttongreen:focus,
+
 .buttongreen:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
 }
 
 .btnpanel {
-  color: beige;
-  background-color: gray;
+  color: rgb(184, 184, 184);
+  background-color: rgb(28, 28, 28);
   cursor: pointer;
   font-weight: 300;
-  padding: 0.6em 1.2em;
+  padding: 19px;
   border-radius: 8px;
-}
-.backcolor { 
-  color: #A29BFE;
+  border-radius: 5px;
+  border-color: gray;
+  
+  
 }
 
-.hcolor {
-  color: rgb(60, 60, 124)
+.mm-box {
+  
+  padding: 10px;
+  border-radius: 5px; 
+  box-shadow: 0 0px 2px rgba(0, 0, 0, 0.1); 
+}
+
+.tabsul {
+  display: flex;
+  margin: 0;
+  padding: 4px;
+  align-items: center;
+}
+
+.tabitem {
+  padding: 10px 20px;
+  margin: 0 10px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  border-bottom: #3077be;
+  
+}
+
+
+.tabitem:hover {
+  border-radius: 5px;
+  background-color: #3077be;
 }
