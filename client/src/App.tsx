@@ -1,10 +1,10 @@
 import { BrowserProvider, ethers, Wallet } from 'ethers'
 import './App.css'
-import { useState } from 'react'
+import './index.css'
+import { use, useState } from 'react'
 import axios from 'axios';
 import toast, { Toaster } from 'react-hot-toast';
 import 'react-toastify/dist/ReactToastify.css';
-import { useSwapCallback, useTokenBalance, useTokenInfo } from '@uniswap/sdk-react'
 
 const apiKey = import.meta.env.VITE_ETHERSCAN_API_KEY;
 
@@ -13,13 +13,19 @@ const App: React.FC = () => {
 
   const [transactions, setTransactions] = useState<any[]>([]);
   const [adresse, setAdresse] = useState<string>("");
-  const [solde, setSolde] = useState<string>("");
+  const [solde, setSolde] = useState<string>('0');
   const [estConnecte, setConnecter] = useState(false);
   const [montant, setMontant] = useState<string>("")
   const [destinataire, setDestinataire] = useState<string>("")
   const [Ongletup, setOngletUp] = useState(false);
   const [swapUp, setSwapUp] = useState(false);
   const [MenuUp, setMenuUp] = useState(false);
+  const [receiveUp, setReceiveUp] = useState(false);
+
+  //  TEST
+   const receiv = () => {
+    setReceiveUp(true);
+  };
     
 const getTransactions = async (adresse: string) => {
   try {
@@ -43,14 +49,14 @@ const getTransactions = async (adresse: string) => {
   }
 };
 
-   const { data: tokenBalance } = useTokenBalance('0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48') 
-   const { data: tokenInfo } = useTokenInfo('0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48')
+     const getSolde = async (adresseUser: string, provider: BrowserProvider) => {
+     const balance = await provider.getBalance(adresseUser);
+     const balanceEther = parseFloat(ethers.formatEther(balance));
+     const balanceRond = balanceEther.toFixed(4);
+     setSolde(balanceRond);
+     console.log("Solde ETH :", balanceRond);
 
-  const getSolde = async (adresseUser: string, provider: BrowserProvider) => {
-    const balance = await provider.getBalance(adresseUser);
-    setSolde(ethers.formatEther(balance));
-     console.log("Solde ETH :", ethers.formatEther(balance));
-  }
+  };
 
   const connecterWallet = async () => {
     if (typeof window.ethereum !== 'undefined') {
@@ -117,7 +123,8 @@ const getTransactions = async (adresse: string) => {
   }
    /////////////////////////////////////////////////////////////
      return (
-
+ 
+    
   <div className="bg-gray-900 min-h-screen flex flex-col">
   <header>
   <nav className= "px-4 py-3 navbar navbar-expand-lg navbar-light py-lg-0">
@@ -134,10 +141,9 @@ const getTransactions = async (adresse: string) => {
         </button>
        </div>
       </div>
-
      </nav>
-
     </header>
+
    <div>
    <div className="mx-130 px-3 p-10 mt-10 rounded-lg shadow-md text-center bg-gray-800 relative">
      <div>
@@ -149,14 +155,17 @@ const getTransactions = async (adresse: string) => {
         <p className=" absolute text-gray-400 mb-5 top-3 left-5">Your balances:</p>
          <span className="whitespace-nowrap text-4xl font-semibold leading-none">{solde}0.00$</span>
           </div>
-              <button className='btnpanel mx-1' > Receive </button> 
-
-              <button onClick={() => setSwapUp(true)} className='btnpanel mx-1'>Swap
+                
+                      <button onClick={() => (setReceiveUp(true))} className="btnpanel mx-1">
+                        Receive
+                        </button>  
+              <button onClick={() => setSwapUp(true)} className='btnpanel mx-1'>
+                Swap
                  <img src="swap.svg" alt="swap" className='imgbtn'/>
               </button>
              { swapUp && (
               <div className='fixed inset-0 bg-opacity- 50 flex items-center justify-center z-50 '>
-              <div className='bg-black rounded-lg p-5 w-96 h-60 relative'>             
+              <div className='bg-white rounded-lg p-5 w-96 h-60 relative'>             
                 <h2 className=" font-bold">Swap</h2>
                <div className='mb-4'>
                <a className='font-semibold text-gray-500 leading-none flex whitespace-nowrap '> Pay: </a>
@@ -191,12 +200,12 @@ const getTransactions = async (adresse: string) => {
             </button>
 
             {Ongletup && (
-              <div className="fixed inset-0  bg-opacity-50 flex items-center justify-center z-50">
-             <div className="bg-black rounded-xl p-6 mx-auto shadow-xl relative">
-               <h2 className="text-xl font-bold mb-4 text-gray-500">Envoyer des ETH</h2>
-                <div className="flex justify-center items-center space-x-2">      
-                    <button onClick={envoyerETH}
-                    
+                <div className="fixed inset-0  bg-opacity-50 flex items-center justify-center z-50">
+                <div className="bg-white rounded-xl p-6 mx-auto shadow-xl relative">
+                <h2 className="text-xl font-bold mb-4 text-gray-500">Envoyer des ETH</h2>
+                  <div className="flex justify-center items-center space-x-2">      
+                  <button onClick={envoyerETH}
+                      
                   className="bg-gray-500 px-4 py-2 rounded cursor-pointer" >
                      Envoyer
                      </button>
@@ -248,7 +257,7 @@ const getTransactions = async (adresse: string) => {
         </ul>
         </div>
      </div>      
-     
+
      )}
 
 export default App;
