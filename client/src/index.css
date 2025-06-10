@@ -22,7 +22,7 @@ body {
   place-items: center;
   min-width: 320px;
   min-height: 100vh;
-  background-color: #454575; 
+  background-color: #ffffff; 
 }
 
 h1 {
@@ -55,8 +55,8 @@ h1 {
 }
 
 .btnpanel {
-  color: rgb(184, 184, 184);
-  background-color: rgb(28, 28, 28);
+  color: rgb(0, 0, 0);
+  background-color: rgb(255, 255, 255);
   cursor: pointer;
   font-weight: 300;
   padding: 19px;
@@ -92,7 +92,15 @@ h1 {
 }
 
 
-.tabitem:hover {
+.tabitem:hover{
   border-radius: 5px;
   background-color: #3077be;
+}
+
+.imgbtn {
+  margin-top: 10px;
+  width: 30px;
+  height: 10px;
+  display: flex;
+  align-items: center;
 }

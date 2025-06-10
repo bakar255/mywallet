@@ -4,9 +4,9 @@ import { useState } from 'react'
 import axios from 'axios';
 import toast, { Toaster } from 'react-hot-toast';
 import 'react-toastify/dist/ReactToastify.css';
+import { useSwapCallback, useTokenBalance, useTokenInfo } from '@uniswap/sdk-react'
 
 const apiKey = import.meta.env.VITE_ETHERSCAN_API_KEY;
-const notify = () => toast('Here is your toast.');
 
 
 const App: React.FC = () => { 
@@ -36,12 +36,15 @@ const getTransactions = async (adresse: string) => {
       }
     });
 
-    return response.data.result; // tableau des transactions
+    return response.data.result; 
   } catch (error) {
     console.error("Erreur lors de la récupération des transactions :", error);
     return [];
   }
 };
+
+   const { data: tokenBalance } = useTokenBalance('0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48') 
+   const { data: tokenInfo } = useTokenInfo('0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48')
 
   const getSolde = async (adresseUser: string, provider: BrowserProvider) => {
     const balance = await provider.getBalance(adresseUser);
@@ -115,39 +118,42 @@ const getTransactions = async (adresse: string) => {
    /////////////////////////////////////////////////////////////
      return (
 
-<div className="bg-gray-900 min-h-screen flex flex-col">
+  <div className="bg-gray-900 min-h-screen flex flex-col">
+  <header>
   <nav className= "px-4 py-3 navbar navbar-expand-lg navbar-light py-lg-0">
     <div className="max-w-7xl mx-auto flex justify-between items-center"> 
       <div className="text-white text-lg font-bold">Wallet D&R</div>
-      <div className="space-x-2">   
+      <div className="space-x-2 ">   
+        <button  className=" px-2 rounded-lg cursor-pointer">
+          <img src="/notification.svg" alt='notif' className='w-8 cursor-pointer'/>
+        </button>
         <button 
           onClick={estConnecte ? deconnecterWallet : connecterWallet} 
-          className="bg-gray-500 hover:bg-gray-500 text-amber-100 px-3 py-1 rounded cursor-pointer"> 
+          className="btnpanel"> 
           {estConnecte ? "Déconnecter" : "Connecter"}
         </button>
-        <button  className="bg-gray-500 hover:bg-gray-500 text-amber-100 px-3 py-1 rounded-lg cursor-pointer">
-          
-          Wallet 
-        </button>
+       </div>
       </div>
-    </div>
-  </nav>
 
+     </nav>
 
-<div>
- <div className="mx-130 px-3 p-10 mt-10 rounded-lg shadow-md text-center bg-gray-800 relative">
-    <div className="text-center p-6 rounded-lg">
+    </header>
+   <div>
+   <div className="mx-130 px-3 p-10 mt-10 rounded-lg shadow-md text-center bg-gray-800 relative">
+     <div>
+     </div>
+  
+      <div className="text-center p-6 rounded-lg">
        <div className='mb-7'>
         <h2 className='text-4xl absolute  top-1 font-semibold text-gray-500'></h2>
         <p className=" absolute text-gray-400 mb-5 top-3 left-5">Your balances:</p>
          <span className="whitespace-nowrap text-4xl font-semibold leading-none">{solde}0.00$</span>
           </div>
-               
               <button className='btnpanel mx-1' > Receive </button> 
 
-              <button onClick={() => setSwapUp(true)} className='btnpanel'>Swap
+              <button onClick={() => setSwapUp(true)} className='btnpanel mx-1'>Swap
+                 <img src="swap.svg" alt="swap" className='imgbtn'/>
               </button>
-
              { swapUp && (
               <div className='fixed inset-0 bg-opacity- 50 flex items-center justify-center z-50 '>
               <div className='bg-black rounded-lg p-5 w-96 h-60 relative'>             
@@ -177,12 +183,10 @@ const getTransactions = async (adresse: string) => {
                       
              </div>
               )}
-               
             <button
                 onClick={() => setOngletUp(true)}
-                className="btnpanel  mx-1"
-               
-            >
+                className="btnpanel">
+                  <img src="/scan-barcode.svg" alt="scan" className='imgbtn' />
                 Send
             </button>
 
@@ -230,14 +234,10 @@ const getTransactions = async (adresse: string) => {
                 <li className='tabitem'>Assets</li>
               </ul>
             </div>
-    </div>
- 
-      
-     
-            
-    </div>
+        </div>  
+        </div>
        <div className='rounded-lg mb-10'>
-         <h2 className='font semi-bold leading-none text-2xl'>Transactions : </h2>
+         <h2 className='font semi-bold leading-none text-2xl'></h2>
          <ul className="text-sm text-white space-y-2 max-h-48 overflow-y-auto">
             {transactions.slice(0, 5).map(tx => (
             <li key={tx.hash}>
@@ -247,14 +247,8 @@ const getTransactions = async (adresse: string) => {
             }
         </ul>
         </div>
-
-        
-
      </div>      
      
-   
-
-
      )}
 
 export default App;
