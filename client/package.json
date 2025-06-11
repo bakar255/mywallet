@@ -10,6 +10,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@ethersproject/address": "^5.8.0",
     "@tailwindcss/vite": "^4.1.7",
     "@uniswap/sdk-core": "^7.7.2",
     "@uniswap/smart-order-router": "^4.21.18",
@@ -21,7 +22,8 @@
     "react-dom": "^19.1.0",
     "react-hot-toast": "^2.5.2",
     "react-toastify": "^11.0.5",
-    "tailwindcss": "^4.1.7"
+    "tailwindcss": "^4.1.7",
+    "uniswap": "^0.0.1"
   },
   "devDependencies": {
     "@eslint/js": "^9.25.0",

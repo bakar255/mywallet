@@ -5,6 +5,8 @@ import { use, useState } from 'react'
 import axios from 'axios';
 import toast, { Toaster } from 'react-hot-toast';
 import 'react-toastify/dist/ReactToastify.css';
+import { swapETHUSDC } from './uniswap';
+
 
 const apiKey = import.meta.env.VITE_ETHERSCAN_API_KEY;
 
@@ -21,13 +23,17 @@ const App: React.FC = () => {
   const [swapUp, setSwapUp] = useState(false);
   const [MenuUp, setMenuUp] = useState(false);
   const [receiveUp, setReceiveUp] = useState(false);
+  const [montantSwap, setMontantSwap] = useState("");
 
   //  TEST
    const receiv = () => {
     setReceiveUp(true);
   };
+
+  const notify = () => toast('Toast');
+
     
-const getTransactions = async (adresse: string) => {
+  const getTransactions = async (adresse: string) => {
   try {
     const apiKey = "CNPFJ4M9XJ1E22668DE748A2XQP5JBXQI4"; 
     const response = await axios.get(`https://api.etherscan.io/api`, {
@@ -86,6 +92,8 @@ const getTransactions = async (adresse: string) => {
     setTransactions([]);
     console.log("Déconnecté.")
     setConnecter(false)
+    toast.error("Votre Wallet est déconnecter")
+
    }
 
     
@@ -120,13 +128,36 @@ const getTransactions = async (adresse: string) => {
       console.error("Erreur en envoyant l'ETH:", error)
       toast.error("Erreur lors de l'envoi : " + error.message)
     }
+
+  const GetAddr = async () => {
+  if (!estConnecte) {
+    toast.error("Connecte ton wallet d'abord");
+    return; // On arrête la fonction ici si pas connecté
   }
+
+  try {
+    const provider = new BrowserProvider(window.ethereum);
+    const signer = await provider.getSigner();
+    const userAddress = await signer.getAddress();
+
+    setAdresse(userAddress); // Met à jour l’état avec l’adresse récupérée
+
+    // Ici tu peux ouvrir ta popup ou faire ce que tu veux avec l’adresse
+  } catch (error) {
+    toast.error("Erreur lors de la récupération de l'adresse");
+    console.error(error);
+  }
+  }
+
+  };
+
    /////////////////////////////////////////////////////////////
      return (
  
     
-  <div className="bg-gray-900 min-h-screen flex flex-col">
+  <div className="bg-linear-to-t from-sky-600 to-indigo-500 min-h-screen flex-col">
   <header>
+  <Toaster />
   <nav className= "px-4 py-3 navbar navbar-expand-lg navbar-light py-lg-0">
     <div className="max-w-7xl mx-auto flex justify-between items-center"> 
       <div className="text-white text-lg font-bold">Wallet D&R</div>
@@ -134,74 +165,70 @@ const getTransactions = async (adresse: string) => {
         <button  className=" px-2 rounded-lg cursor-pointer">
           <img src="/notification.svg" alt='notif' className='w-8 cursor-pointer'/>
         </button>
-        <button 
-          onClick={estConnecte ? deconnecterWallet : connecterWallet} 
-          className="btnpanel"> 
+        <button  className="outline-2 outline-offset-2 focus:outline-2 rounded-xl shadow-blue-400 p-1"  onClick={estConnecte ? deconnecterWallet : connecterWallet} > 
           {estConnecte ? "Déconnecter" : "Connecter"}
         </button>
        </div>
       </div>
      </nav>
     </header>
-
+   
    <div>
    <div className="mx-130 px-3 p-10 mt-10 rounded-lg shadow-md text-center bg-gray-800 relative">
      <div>
      </div>
   
-      <div className="text-center p-6 rounded-lg">
-       <div className='mb-7'>
-        <h2 className='text-4xl absolute  top-1 font-semibold text-gray-500'></h2>
-        <p className=" absolute text-gray-400 mb-5 top-3 left-5">Your balances:</p>
-         <span className="whitespace-nowrap text-4xl font-semibold leading-none">{solde}0.00$</span>
-          </div>
-                
-                      <button onClick={() => (setReceiveUp(true))} className="btnpanel mx-1">
+            <div className="text-center p-6 rounded-lg">
+            <div className='mb-7'>
+              <h2 className='text-4xl absolute  top-1 font-semibold text-gray-500'></h2>
+              <p className=" absolute text-gray-400 mb-5 top-3 left-5 font-semibold">Your balance:</p>
+              <span className="whitespace-nowrap text-4xl font-semibold leading-none">{solde}$</span>
+                </div>
+                      <button onClick={() => (setReceiveUp(true))} className="btnpanel">
                         Receive
+                        <img src="/scan-barcode.svg" alt="scan" className='imgbtn' />
                         </button>  
               <button onClick={() => setSwapUp(true)} className='btnpanel mx-1'>
                 Swap
                  <img src="swap.svg" alt="swap" className='imgbtn'/>
               </button>
              { swapUp && (
-              <div className='fixed inset-0 bg-opacity- 50 flex items-center justify-center z-50 '>
-              <div className='bg-white rounded-lg p-5 w-96 h-60 relative'>             
-                <h2 className=" font-bold">Swap</h2>
-               <div className='mb-4'>
+              <div className=' fixed inset-0 flex items-center justify-center z-50 '>
+              <div className= 'lalacolor rounded-xl p-5 w-96 h-60 relative '>             
+              <h2 className=" font-bold">Swap</h2>
+               <div className='relative'>
                <a className='font-semibold text-gray-500 leading-none flex whitespace-nowrap '> Pay: </a>
-                <input type="text" placeholder='0.00$' className=' border-gray-300 rounded px-3 py-2 bg-gray-700 text-white text-right'
+                <input type="text" placeholder='0.00$' className='border-2 border-gray-300 rounded px-3 py-2 bg-gray-700 text-white text-right'
                 />
                 <div className='flex justify-center'>
                 <button className='cursor-pointer' >
                 <img src="/swap.svg" alt="" className='w-10 h-10 inline-flex rounded-full'/>
                 </button>
-                </div>
-                </div>          
-                <div className='mb-4'>
-                <a className='font-semibold leading-none flex whitespace-nowrap'> Receive: </a>
-                <input type="text" placeholder='0.00$' 
-                className=' border-gray-300 p-4 rounded text-gray-500 mb-10 text-right py-2 px-3 bg-gray-700'
+                  </div>
+                </div>   
+
+                <div className=''>
+                <a className=' text-gray-500 font-semibold leading-none flex whitespace-nowrap'> Receive: </a>
+                <input type="text" placeholder='0.00$' className='border-2 border-gray-300 p-4 rounded text-white mb-10 text-right py-2 px-3 bg-gray-700'
                 />
+                <button className=' px-5 left-0 cursor-pointer py-2 outline-2 focus:outline rounded-xl'>Swap</button>
                 <button
-                onClick= {() => setSwapUp(false) } className='absolute top-2 right-2 text-1xl text-white'>
+                onClick= {() => setSwapUp(false) } className='x'>
                 x
                 </button>
-                    
-                   </div>
-                </div>
-                      
+                  </div>
+                </div>      
              </div>
               )}
             <button
-                onClick={() => setOngletUp(true)}
-                className="btnpanel">
-                  <img src="/scan-barcode.svg" alt="scan" className='imgbtn' />
-                Send
+                onClick={() => setOngletUp(true)} className="btnpanel">
+                Envoyer
+                 <img src="send.svg" alt="send" className='imgbtn' />
             </button>
 
             {Ongletup && (
-                <div className="fixed inset-0  bg-opacity-50 flex items-center justify-center z-50">
-                <div className="bg-white rounded-xl p-6 mx-auto shadow-xl relative">
+                <div className=" fixed inset-0  bg-opacity-50 flex items-center justify-center z-50">
+                <div className="lalacolor rounded-xl p-6 mx-auto shadow-xl relative">
                 <h2 className="text-xl font-bold mb-4 text-gray-500">Envoyer des ETH</h2>
                   <div className="flex justify-center items-center space-x-2">      
                   <button onClick={envoyerETH}
@@ -209,7 +236,6 @@ const getTransactions = async (adresse: string) => {
                   className="bg-gray-500 px-4 py-2 rounded cursor-pointer" >
                      Envoyer
                      </button>
-
               <input
                 type="text"    
                placeholder="Montant Eth"
@@ -224,19 +250,21 @@ const getTransactions = async (adresse: string) => {
                 value={destinataire}
                 onChange={(e) => setDestinataire(e.target.value)} />
 
-          <button
-         onClick={() => setOngletUp(false)}
-         className="absolute top-2 right-2 text-gray-500 hover:text-gray-800"
-                 >
-         &times;
-       </button>
-       </div>
-        
-     </div>
-     </div>
-        )}
-    </div>
-     <div className='mm-box tabs'>
+              <button
+            onClick={() => setOngletUp(false)}
+            className="x"
+                    >
+            &times;
+          </button>
+          </div>
+        </div>
+        </div>
+            )}
+        </div>
+         <div className='border-2 border-solid border-gray-400 rounded-lg'>
+
+            </div>
+        <div className='mm-box tabs'>
               <ul className='justify-center space-x-8 tabsul'>
                 <li className='tabitem'>Activity</li>
                 <li className='tabitem'>Jetons NFT</li>

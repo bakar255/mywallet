@@ -10,6 +10,13 @@
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  background-color: #76ff64;
+}
+
+.body {
+
+ background-color: rgb(109, 114, 177);
+
 }
 
 body {
@@ -19,7 +26,7 @@ body {
   place-items: center;
   min-width: 320px;
   min-height: 100vh;
-  background-color: #b72424; 
+  background-color: #ffffff; 
 }
 
 h1 {
@@ -53,7 +60,7 @@ h1 {
 
 .btnpanel {
   color: rgb(0, 0, 0);
-  background-color: rgb(255, 255, 255);
+  background-color: rgb(109, 114, 177);
   cursor: pointer;
   font-weight: 300;
   padding: 19px;
@@ -95,9 +102,9 @@ h1 {
 }
 
 .imgbtn {
-  margin-top: 10px;
-  width: 30px;
-  height: 10px;
+
+  width: 50px;
+  height: 30px;
   display: flex;
   align-items: center;
 }
@@ -108,4 +115,30 @@ h1 {
   top: 50%;
   left: 50%;
   transform: translate()
+}
+
+p {
+  color: gray;
+}
+
+.lalacolor{
+     background-color: #1a1a1a;
+}
+
+.x {
+
+  position: absolute;
+  top: 0.5rem; 
+  right: 0.5rem; 
+  font-size: 1rem; 
+  color: #ffffff;
+  margin-left: 1.25rem; 
+  border-width: 1px; 
+  border-radius: 0.75rem; 
+  padding-left: 0.75rem;
+  padding-right: 0.75rem; 
+}
+
+.x:hover {
+  color:gray
 }
