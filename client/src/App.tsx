@@ -4,8 +4,11 @@ import './index.css'
 import { use, useState } from 'react'
 import axios from 'axios';
 import toast, { Toaster } from 'react-hot-toast';
+// import { QRCode } from 'qrcode.react';
+import QRCode from "react-qr-code";
 import 'react-toastify/dist/ReactToastify.css';
 import { swapETHUSDC } from './uniswap';
+
 
 
 const apiKey = import.meta.env.VITE_ETHERSCAN_API_KEY;
@@ -16,6 +19,7 @@ const App: React.FC = () => {
   const [transactions, setTransactions] = useState<any[]>([]);
   const [adresse, setAdresse] = useState<string>("");
   const [solde, setSolde] = useState<string>('0');
+  const [walletaddr, setWalletAddr] = useState('0x0000000000000000000000000000000000000000');
   const [estConnecte, setConnecter] = useState(false);
   const [montant, setMontant] = useState<string>("")
   const [destinataire, setDestinataire] = useState<string>("")
@@ -24,6 +28,8 @@ const App: React.FC = () => {
   const [MenuUp, setMenuUp] = useState(false);
   const [receiveUp, setReceiveUp] = useState(false);
   const [montantSwap, setMontantSwap] = useState("");
+
+ 
 
   //  TEST
    const receiv = () => {
@@ -74,6 +80,7 @@ const App: React.FC = () => {
       const adresseUser = await signer.getAddress();
       // Utiliser l'adresseUser
       setAdresse(adresseUser);
+      setWalletAddr(adresseUser);
       console.log("Adresse connectée :", adresseUser);
       // Afficher le solde UI
       await getSolde(adresseUser, provider);
@@ -86,6 +93,7 @@ const App: React.FC = () => {
         }
   }
 
+
     const deconnecterWallet = () => {
     setAdresse("");
     setSolde("");
@@ -93,10 +101,21 @@ const App: React.FC = () => {
     console.log("Déconnecté.")
     setConnecter(false)
     toast.error("Votre Wallet est déconnecter")
+    setWalletAddr("");
 
    }
 
-    
+     const copyWallet = () => {
+      navigator.clipboard.writeText(walletaddr)
+        .then(() => {
+          toast.success('Adresse copiée dans le presse-papiers !');
+        })
+        .catch(err => {
+          toast.error('Erreur lors de la copie : ', err);
+        });
+      }
+   
+   
 //
       const envoyerETH = async () => {
     if (!estConnecte) {
@@ -148,6 +167,8 @@ const App: React.FC = () => {
     console.error(error);
   }
   }
+ 
+    
 
   };
 
@@ -158,60 +179,90 @@ const App: React.FC = () => {
   <div className="bg-linear-to-t from-sky-600 to-indigo-500 min-h-screen flex-col">
   <header>
   <Toaster />
-  <nav className= "px-4 py-3 navbar navbar-expand-lg navbar-light py-lg-0">
+  <nav className= " lalacolor px-4 py-3 navbar navbar-expand-lg navbar-light py-lg-0">
     <div className="max-w-7xl mx-auto flex justify-between items-center"> 
       <div className="text-white text-lg font-bold">Wallet D&R</div>
       <div className="space-x-2 ">   
         <button  className=" px-2 rounded-lg cursor-pointer">
           <img src="/notification.svg" alt='notif' className='w-8 cursor-pointer'/>
         </button>
-        <button  className="outline-2 outline-offset-2 focus:outline-2 rounded-xl shadow-blue-400 p-1"  onClick={estConnecte ? deconnecterWallet : connecterWallet} > 
+        <button  className="buttongreen"  onClick={estConnecte ? deconnecterWallet : connecterWallet} > 
           {estConnecte ? "Déconnecter" : "Connecter"}
-        </button>
-       </div>
-      </div>
-     </nav>
-    </header>
-   
-   <div>
-   <div className="mx-130 px-3 p-10 mt-10 rounded-lg shadow-md text-center bg-gray-800 relative">
-     <div>
-     </div>
-  
+          </button>
+        </div>
+        </div>
+      </nav>
+      </header>
+    
+          <div>
+          <div className="mx-130 px-3 p-10 mt-10 rounded-lg shadow-md text-center bg-gray-800 relative">
+            <div>
+            </div>
             <div className="text-center p-6 rounded-lg">
             <div className='mb-7'>
               <h2 className='text-4xl absolute  top-1 font-semibold text-gray-500'></h2>
               <p className=" absolute text-gray-400 mb-5 top-3 left-5 font-semibold">Your balance:</p>
               <span className="whitespace-nowrap text-4xl font-semibold leading-none">{solde}$</span>
                 </div>
-                      <button onClick={() => (setReceiveUp(true))} className="btnpanel">
-                        Receive
-                        <img src="/scan-barcode.svg" alt="scan" className='imgbtn' />
+                <button onClick={() => setReceiveUp(true)} className="btnpanel">
+                Receive
+                <img src="/scan-barcode.svg" alt="scan" className="imgbtn" />
+              </button>
+                
+              {receiveUp && (
+                <div className="pop-box">
+                  <div className="lalacolor rounded-xl p-10 w-auto h-auto relative">
+                   <div className=''>
+                    <button onClick={() => setReceiveUp(false)} className='x'> x </button>
+                    <p className='text-1xl justify-center font-semibold leading-none mb-6'>Recevoir</p>
+                    </div>   
+                    <div className=' flex flex-col items-center p-5'>                 
+                      <QRCode
+                          value={walletaddr}
+                          size={128}
+                          bgColor="#ffffff"
+                          fgColor="#000000"
+                          level="L"  
+                        />  
+                        </div>
+                        <p className='mb-4 font-semibold'> Adresse: </p>
+                        <p className='font-semibold'>{walletaddr}</p>
+                        <button onClick={copyWallet} className='bg-gray-500 rounded-xl p-3'> Copier l'URL
+                        
                         </button>  
+                        
+                  </div>
+                </div>
+                   
+              )}
+            
               <button onClick={() => setSwapUp(true)} className='btnpanel mx-1'>
                 Swap
                  <img src="swap.svg" alt="swap" className='imgbtn'/>
               </button>
              { swapUp && (
-              <div className=' fixed inset-0 flex items-center justify-center z-50 '>
-              <div className= 'lalacolor rounded-xl p-5 w-96 h-60 relative '>             
+              <div className=' fixed inset-0 flex items-center justify-center z-50 bg-opacity-50 '>
+              <div className= 'lalacolor rounded-xl p-10 w-auto h-auto relative '>             
               <h2 className=" font-bold">Swap</h2>
-               <div className='relative'>
+               <div className=''>
                <a className='font-semibold text-gray-500 leading-none flex whitespace-nowrap '> Pay: </a>
                 <input type="text" placeholder='0.00$' className='border-2 border-gray-300 rounded px-3 py-2 bg-gray-700 text-white text-right'
                 />
+                </div>
                 <div className='flex justify-center'>
                 <button className='cursor-pointer' >
                 <img src="/swap.svg" alt="" className='w-10 h-10 inline-flex rounded-full'/>
                 </button>
-                  </div>
+  
                 </div>   
 
                 <div className=''>
                 <a className=' text-gray-500 font-semibold leading-none flex whitespace-nowrap'> Receive: </a>
                 <input type="text" placeholder='0.00$' className='border-2 border-gray-300 p-4 rounded text-white mb-10 text-right py-2 px-3 bg-gray-700'
                 />
-                <button className=' px-5 left-0 cursor-pointer py-2 outline-2 focus:outline rounded-xl'>Swap</button>
+                <button className=' px-5 cursor-pointer py-2 outline-2 focus:outline rounded-xl  
+                '>Swap</button>
+
                 <button
                 onClick= {() => setSwapUp(false) } className='x'>
                 x
@@ -282,9 +333,9 @@ const App: React.FC = () => {
             </li>
             ))
             }
-        </ul>
-        </div>
-     </div>      
+      </ul>
+     </div>
+   </div>      
 
      )}
 
