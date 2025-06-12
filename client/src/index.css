@@ -1,6 +1,7 @@
 @import "tailwindcss";
 
 
+
 :root {
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
@@ -125,35 +126,56 @@ p {
 
 .x {
 
-  position: absolute;
-  top: 0.5rem; 
-  right: 0.5rem; 
+  position: absolute; 
   font-size: 1rem; 
-  color: #ffffff;
-  margin-left: 1.25rem; 
-  border-width: 1px; 
-  border-radius: 0.75rem; 
-  padding-left: 0.75rem;
-  padding-right: 0.75rem; 
+  color: #000000;
+  border: none;
+  font-weight: bold;
+  font-size: 1.5rem;
+  top: 0.5rem;
+  right: 0.7rem;
 }
 
 .x:hover {
   color:gray
 }
 
-.pop-box{
-  
+
+.popup-touch {
+ 
   position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
   z-index: 50;
-  width: 20%;
-  height: 50%;
+  background-color: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px); 
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 0.75rem;
-  padding: 2.5rem;
 }
- 
+
+.popup-content {
+  animation: popup 0.5s ease-out;
+  transition: all 0.3s ease;
+  background-color: #1a1a1a;
+  color: white;
+  padding: 2rem; 
+  border-radius: 3rem;  
+  width: 100%;
+  max-width: 28rem; 
+}
+
+
+
+@keyframes popup {
+  from {
+    transform: translateY(10px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0px);
+    opacity: 1;
+  }
+}

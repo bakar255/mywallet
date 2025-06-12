@@ -1,7 +1,7 @@
 import { BrowserProvider, ethers, Wallet } from 'ethers'
 import './App.css'
 import './index.css'
-import { use, useState } from 'react'
+import { useState } from 'react'
 import axios from 'axios';
 import toast, { Toaster } from 'react-hot-toast';
 // import { QRCode } from 'qrcode.react';
@@ -27,7 +27,9 @@ const App: React.FC = () => {
   const [swapUp, setSwapUp] = useState(false);
   const [MenuUp, setMenuUp] = useState(false);
   const [receiveUp, setReceiveUp] = useState(false);
-  const [montantSwap, setMontantSwap] = useState("");
+  const [montantSwap, setMontantSwap] = useState("")
+
+  const [mmbox, setMmbox] = useState <'activités' |'jetons'|'assets'>('activités');
 
  
 
@@ -41,8 +43,8 @@ const App: React.FC = () => {
     
   const getTransactions = async (adresse: string) => {
   try {
-    const apiKey = "CNPFJ4M9XJ1E22668DE748A2XQP5JBXQI4"; 
-    const response = await axios.get(`https://api.etherscan.io/api`, {
+   
+      const response = await axios.get(`https://api.etherscan.io/api`, {
       params: {
         module: "account",
         action: "txlist",
@@ -72,9 +74,8 @@ const App: React.FC = () => {
 
   const connecterWallet = async () => {
     if (typeof window.ethereum !== 'undefined') {
-      const provider = new BrowserProvider(window.ethereum);
-      // 
-      await window.ethereum.request({ method: 'eth_requestAccounts', params: [{ eth_accounts: {} }] });
+      const provider = new ethers.BrowserProvider(window.ethereum);
+      await window.ethereum.request({ method: 'eth_requestAccounts'});
       // Signer pour interagir avec la blockchain
       const signer = await provider.getSigner();
       const adresseUser = await signer.getAddress();
@@ -167,7 +168,25 @@ const App: React.FC = () => {
     console.error(error);
   }
   }
- 
+     {transactions.slice(0, 5).map((tx, index) => {
+  const toAddress = typeof tx?.to === 'string' ? `${tx.to.slice(0, 6)}…` : 'Adresse inconnue';
+
+  let amount = 'Montant inconnu';
+  try {
+    if (tx?.value != null) {
+      amount = `${ethers.formatEther(tx.value)} ETH`;
+    }
+  } catch (e) {
+    console.error('Erreur lors du formatage de la valeur:', e);
+  }
+
+  return (
+    <li key={tx?.hash || index}>
+      Vers : {toAddress} • {amount}
+    </li>
+  );
+})}
+
     
 
   };
@@ -180,7 +199,7 @@ const App: React.FC = () => {
   <header>
   <Toaster />
   <nav className= " lalacolor px-4 py-3 navbar navbar-expand-lg navbar-light py-lg-0">
-    <div className="max-w-7xl mx-auto flex justify-between items-center"> 
+    <div className=" mx-auto flex justify-between items-center"> 
       <div className="text-white text-lg font-bold">Wallet D&R</div>
       <div className="space-x-2 ">   
         <button  className=" px-2 rounded-lg cursor-pointer">
@@ -195,93 +214,93 @@ const App: React.FC = () => {
       </header>
     
           <div>
-          <div className="mx-130 px-3 p-10 mt-10 rounded-lg shadow-md text-center bg-gray-800 relative">
-            <div>
-            </div>
-            <div className="text-center p-6 rounded-lg">
-            <div className='mb-7'>
+          <div className=" max-w-max mx-auto p-6  px-3  mt-10 rounded-lg shadow-md text-center bg-gray-800 relative">
+          <div>
+          </div>
+          <div className="text-center p-6 rounded-lg">
+          <div className='mb-7'>
               <h2 className='text-4xl absolute  top-1 font-semibold text-gray-500'></h2>
               <p className=" absolute text-gray-400 mb-5 top-3 left-5 font-semibold">Your balance:</p>
               <span className="whitespace-nowrap text-4xl font-semibold leading-none">{solde}$</span>
                 </div>
-                <button onClick={() => setReceiveUp(true)} className="btnpanel">
-                Receive
-                <img src="/scan-barcode.svg" alt="scan" className="imgbtn" />
-              </button>
-                
-              {receiveUp && (
-                <div className="pop-box">
-                  <div className="lalacolor rounded-xl p-10 w-auto h-auto relative">
-                   <div className=''>
-                    <button onClick={() => setReceiveUp(false)} className='x'> x </button>
-                    <p className='text-1xl justify-center font-semibold leading-none mb-6'>Recevoir</p>
-                    </div>   
-                    <div className=' flex flex-col items-center p-5'>                 
-                      <QRCode
-                          value={walletaddr}
-                          size={128}
-                          bgColor="#ffffff"
-                          fgColor="#000000"
-                          level="L"  
-                        />  
+                           <button onClick={() => setReceiveUp(true)} className="btnpanel">
+                          Receive
+                        <img src="/scan-barcode.svg" alt="scan" className="imgbtn" />
+                      </button>
+                    {receiveUp && (
+                      <div className="popup-touch">
+                        <div className="popup-content">
+                            
+                            <p className=" text-white ">Recevoir</p>
+                              <div className="qr-container flex flex-col items-center p-5">
+                             <QRCode
+                              value={walletaddr}
+                              size={128}
+                              bgColor="#ffffff"
+                              fgColor="#000000"
+                              level="L"
+                            />
+                          </div>
+                          <button onClick={() => setReceiveUp(false)} className="x">x</button>
+                          <p className="address-label mb-4 font-semibold">Adresse:</p>
+                          <span className="address font-semibold">{walletaddr}</span>
+                          <button onClick={copyWallet} className="copy-btn bg-gray-500 rounded-xl p-3">
+                            Copier l'URL
+                          </button>
                         </div>
-                        <p className='mb-4 font-semibold'> Adresse: </p>
-                        <p className='font-semibold'>{walletaddr}</p>
-                        <button onClick={copyWallet} className='bg-gray-500 rounded-xl p-3'> Copier l'URL
-                        
-                        </button>  
-                        
-                  </div>
-                </div>
-                   
-              )}
-            
+                      </div>
+                    )}    
               <button onClick={() => setSwapUp(true)} className='btnpanel mx-1'>
                 Swap
                  <img src="swap.svg" alt="swap" className='imgbtn'/>
-              </button>
-             { swapUp && (
-              <div className=' fixed inset-0 flex items-center justify-center z-50 bg-opacity-50 '>
-              <div className= 'lalacolor rounded-xl p-10 w-auto h-auto relative '>             
-              <h2 className=" font-bold">Swap</h2>
-               <div className=''>
-               <a className='font-semibold text-gray-500 leading-none flex whitespace-nowrap '> Pay: </a>
-                <input type="text" placeholder='0.00$' className='border-2 border-gray-300 rounded px-3 py-2 bg-gray-700 text-white text-right'
-                />
-                </div>
-                <div className='flex justify-center'>
-                <button className='cursor-pointer' >
-                <img src="/swap.svg" alt="" className='w-10 h-10 inline-flex rounded-full'/>
-                </button>
-  
-                </div>   
+                    </button>
+                   { swapUp && (
+                     <div className=' popup-touch'>
+                       <div className= 'popup-content relative'>             
+                       <h2 className=" font-bold">Swap</h2>
+                        <button
+                         onClick= {() => setSwapUp(false) } className='x'>
+                              x 
+                              </button>
+                            <div className=''>
+                            <a className='font-semibold text-gray-500 leading-none flex whitespace-nowrap '> Pay: </a>
+                              <input type="text" placeholder='0.00$' className='border-2 border-gray-300 rounded px-3 py-2 bg-gray-700 text-white text-right'
+                              />
+                              </div>
+                              <div className='flex justify-center'>
+                              <button className='cursor-pointer' >
+                              <img src="/swap.svg" alt="" className='w-10 h-10 inline-flex rounded-full'/>
+                              </button>
+                                <button className=' buttongreen bottom-3 absolute px-5 cursor-pointer py-2 outline-2 focus:outline rounded-xl'>
+                              Swap  
+                              </button>
+                              </div>   
 
-                <div className=''>
-                <a className=' text-gray-500 font-semibold leading-none flex whitespace-nowrap'> Receive: </a>
-                <input type="text" placeholder='0.00$' className='border-2 border-gray-300 p-4 rounded text-white mb-10 text-right py-2 px-3 bg-gray-700'
-                />
-                <button className=' px-5 cursor-pointer py-2 outline-2 focus:outline rounded-xl  
-                '>Swap</button>
-
-                <button
-                onClick= {() => setSwapUp(false) } className='x'>
-                x
-                </button>
-                  </div>
-                </div>      
-             </div>
-              )}
-            <button
-                onClick={() => setOngletUp(true)} className="btnpanel">
-                Envoyer
-                 <img src="send.svg" alt="send" className='imgbtn' />
-            </button>
-
+                            <div className=''>
+                            <a className=' text-gray-500 font-semibold leading-none flex whitespace-nowrap'> Receive: </a>
+                            <input type="text" placeholder='0.00$' className='border-2 border-gray-300 p-4 rounded text-white mb-10 text-right py-2 px-3 bg-gray-700'
+                            onChange={(e) => setMontantSwap(e.target.value)}
+                            />
+              
+                          <button
+                          onClick= {() => setSwapUp(false) } className='x'>
+                              x
+                          </button>
+                         
+                            </div>
+                          </div>      
+                      </div>
+                        )}
+                      <button
+                          onClick={() => setOngletUp(true)} className="btnpanel">
+                          Envoyer
+                          <img src="send.svg" alt="send" className='imgbtn' />
+                      </button>
             {Ongletup && (
                 <div className=" fixed inset-0  bg-opacity-50 flex items-center justify-center z-50">
                 <div className="lalacolor rounded-xl p-6 mx-auto shadow-xl relative">
                 <h2 className="text-xl font-bold mb-4 text-gray-500">Envoyer des ETH</h2>
-                  <div className="flex justify-center items-center space-x-2">      
+                  <div className="flex justify-center items-center space-x-2 ">      
                   <button onClick={envoyerETH}
                       
                   className="bg-gray-500 px-4 py-2 rounded cursor-pointer" >
@@ -290,21 +309,19 @@ const App: React.FC = () => {
               <input
                 type="text"    
                placeholder="Montant Eth"
-                className="border border-gray-300 rounded px-3 py-2 focus:outline-none bg-gray-700 text-white"
+                className="border border-gray-300 rounded-xl px-3 py-2 focus:outline-none bg-gray-700 text-white "
                 value={montant}
                 onChange={(e) => setMontant(e.target.value)}
                  />
                 <input         
                 type="text"
                 placeholder="Adresse"
-                className="border border-gray-300 rounded px-3 py-2 focus:outline-none bg-gray-700 text-white"
+                className="border border-gray-300 rounded-xl px-3 py-2 focus:outline-none bg-gray-700 text-white"
                 value={destinataire}
                 onChange={(e) => setDestinataire(e.target.value)} />
-
               <button
             onClick={() => setOngletUp(false)}
-            className="x"
-                    >
+            className="x" >
             &times;
           </button>
           </div>
@@ -313,7 +330,6 @@ const App: React.FC = () => {
             )}
         </div>
          <div className='border-2 border-solid border-gray-400 rounded-lg'>
-
             </div>
         <div className='mm-box tabs'>
               <ul className='justify-center space-x-8 tabsul'>
@@ -327,12 +343,6 @@ const App: React.FC = () => {
        <div className='rounded-lg mb-10'>
          <h2 className='font semi-bold leading-none text-2xl'></h2>
          <ul className="text-sm text-white space-y-2 max-h-48 overflow-y-auto">
-            {transactions.slice(0, 5).map(tx => (
-            <li key={tx.hash}>
-             Vers : {tx.to.slice(0, 6)}… • {ethers.formatEther(tx.value)} ETH
-            </li>
-            ))
-            }
       </ul>
      </div>
    </div>      
