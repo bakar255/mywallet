@@ -36,6 +36,13 @@ h1 {
   color: #ffffff; 
 }
 
+.wallet {
+  
+  max-width: 400px;
+
+
+}
+
 .buttongreen {
   border-radius: 8px;
   border: 1px solid transparent;
@@ -64,7 +71,7 @@ h1 {
   background-color: rgb(109, 114, 177);
   cursor: pointer;
   font-weight: 300;
-  padding: 19px;
+  padding: 13px;
   border-radius: 8px;
   border-radius: 5px;
   border-color: gray;
@@ -92,6 +99,12 @@ h1 {
   transition: background-color 0.3s;
   border-bottom: #3077be;
   
+}
+
+.tabitem button.actif {
+  background-color: #3b82f6;
+  color: white;
+  font-weight: bold;
 }
 
 
@@ -179,3 +192,13 @@ p {
     opacity: 1;
   }
 }
+
+.onglet-container {
+  padding: 1rem;
+  max-width: 400px;
+  margin: auto;
+  height: auto;
+}
+
+
+

@@ -28,8 +28,7 @@ const App: React.FC = () => {
   const [MenuUp, setMenuUp] = useState(false);
   const [receiveUp, setReceiveUp] = useState(false);
   const [montantSwap, setMontantSwap] = useState("")
-
-  const [mmbox, setMmbox] = useState <'activités' |'jetons'|'assets'>('activités');
+  const [mmbox, setMmbox] = useState ('activités');
 
  
 
@@ -37,6 +36,13 @@ const App: React.FC = () => {
    const receiv = () => {
     setReceiveUp(true);
   };
+
+
+  const geremmbox = (tab) => {
+  setMmbox(tab)
+  }
+
+  const mmonglets = ['activités', 'jetonsNFT', 'assets']
 
   const notify = () => toast('Toast');
 
@@ -214,15 +220,15 @@ const App: React.FC = () => {
       </header>
     
           <div>
-          <div className=" max-w-max mx-auto p-6  px-3  mt-10 rounded-lg shadow-md text-center bg-gray-800 relative">
+          <div className=" wallet mx-auto p-6  px-3  mt-10 rounded-lg shadow-md text-center bg-gray-800 relative">
           <div>
           </div>
           <div className="text-center p-6 rounded-lg">
-          <div className='mb-7'>
-              <h2 className='text-4xl absolute  top-1 font-semibold text-gray-500'></h2>
+          <div className='mb-10'>
               <p className=" absolute text-gray-400 mb-5 top-3 left-5 font-semibold">Your balance:</p>
               <span className="whitespace-nowrap text-4xl font-semibold leading-none">{solde}$</span>
                 </div>
+     
                            <button onClick={() => setReceiveUp(true)} className="btnpanel">
                           Receive
                         <img src="/scan-barcode.svg" alt="scan" className="imgbtn" />
@@ -303,7 +309,7 @@ const App: React.FC = () => {
                   <div className="flex justify-center items-center space-x-2 ">      
                   <button onClick={envoyerETH}
                       
-                  className="bg-gray-500 px-4 py-2 rounded cursor-pointer" >
+                  className="buttongreen" >
                      Envoyer
                      </button>
               <input
@@ -329,14 +335,23 @@ const App: React.FC = () => {
         </div>
             )}
         </div>
-         <div className='border-2 border-solid border-gray-400 rounded-lg'>
+         <div className='border-2 border-solid border-gray-400 rounded-lg relative'>
             </div>
-        <div className='mm-box tabs'>
-              <ul className='justify-center space-x-8 tabsul'>
-                <li className='tabitem'>Activity</li>
-                <li className='tabitem'>Jetons NFT</li>
-                <li className='tabitem'>Assets</li>
+        <div className='mm-box tabs inline-block'>
+              <ul className='justify-center tabsul'>
+                <button onClick={() => geremmbox ('activités')}  className='tabitem'>Activity</button>
+                <button onClick={() => geremmbox ('jetonsNFT')} className='tabitem'>Jetons NFT</button>
+                <button onClick={() => geremmbox ('assets')} className='tabitem'>Assets</button>
               </ul>
+            </div>
+            <div>
+              <span>
+                <div className='onglet-container shadow bg-gray-700'>
+                  {mmbox === 'activités' && <div> <h4>Activité </h4></div>} 
+                  {mmbox === 'jetonsNFT' && <div> <h4>Jetons NFT </h4></div>}
+                  {mmbox === 'assets' && <div><h4>Assets </h4></div>}
+               </div>
+              </span>          
             </div>
         </div>  
         </div>
