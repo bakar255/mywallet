@@ -58,7 +58,7 @@ const App: React.FC = () => {
         startblock: 0,
         endblock: 99999999,
         sort: "desc",
-        apikey: apiKey
+        apikey: apiKey,
       }
     });
 
@@ -192,123 +192,125 @@ const App: React.FC = () => {
     </li>
   );
 })}
-
-    
-
   };
-
    /////////////////////////////////////////////////////////////
-     return (
- 
-    
+return (
   <div className="bg-linear-to-t from-sky-600 to-indigo-500 min-h-screen flex-col">
-  <header>
-  <Toaster />
-  <nav className= " lalacolor px-4 py-3 navbar navbar-expand-lg navbar-light py-lg-0">
-    <div className=" mx-auto flex justify-between items-center"> 
-      <div className="text-white text-lg font-bold">Wallet D&R</div>
-      <div className="space-x-2 ">   
-        <button  className=" px-2 rounded-lg cursor-pointer">
-          <img src="/notification.svg" alt='notif' className='w-8 cursor-pointer'/>
-        </button>
-        <button  className="buttongreen"  onClick={estConnecte ? deconnecterWallet : connecterWallet} > 
-          {estConnecte ? "Déconnecter" : "Connecter"}
-          </button>
-        </div>
+    <header>
+      <Toaster />
+      <nav className="lalacolor px-4 py-3 navbar navbar-expand-lg navbar-light py-lg-0">
+        <div className="mx-auto flex justify-between items-center">
+          <div className="text-white text-lg font-bold">Wallet D&R</div>
+          <div className="space-x-2">
+            <button className="px-2 rounded-lg cursor-pointer">
+              <img src="/notification.svg" alt='notif' className='w-8 cursor-pointer' />
+            </button>
+            <button className="buttongreen" onClick={estConnecte ? deconnecterWallet : connecterWallet}>
+              {estConnecte ? "Déconnecter" : "Connecter"}
+            </button>
+          </div>
         </div>
       </nav>
-      </header>
-    
-          <div>
-          <div className=" wallet mx-auto p-6  px-3  mt-10 rounded-lg shadow-md text-center bg-gray-800 relative">
-          <div>
-          </div>
-          <div className="text-center p-6 rounded-lg">
+    </header>
+    <div>
+      <div className="wallet mx-auto p-6 px-3 mt-10 rounded-lg shadow-md text-center bg-gray-800 relative">
+        <div className="text-center p-6 rounded-lg ">
+          <select name="" id="network" className='absolute top-2 right-3 rounded-lg flex w-20 min-h-[40px] bg-gray-500 '>
+            <option value="Sepolia" >Sepolia <img src="arrow.svg" alt="arrow" className='w-10' /></option>
+            <option value="Mainnet Eth"> Mainnet</option>
+          </select>
+         <span className='whitespace-nowrap text-shadow-xs text-gray-500 font-semibold leading-none mt-1'>{solde}ETH</span>
           <div className='mb-10'>
-              <p className=" absolute text-gray-400 mb-5 top-3 left-5 font-semibold">Your balance:</p>
-              <span className="whitespace-nowrap text-4xl font-semibold leading-none">{solde}$</span>
+            <p className="absolute text-gray-400 mb-5 top-3 left-5 font-semibold">Your balance:</p>
+            <span className="whitespace-nowrap text-4xl font-semibold leading-none ">0$</span>
+            <span className='whitespace-nowrap text-shadow-xs text-gray-500 font-semibold leading-none'></span>
+          </div>
+          <button onClick={() => setReceiveUp(true)} className="btnpanel">
+            Receive
+            <img src="/scan-barcode.svg" alt="scan" className="imgbtn" />
+          </button> 
+          {receiveUp && (
+            <div className="popup-touch">
+              <div className="popup-receive relative flex flex-col">
+                <button onClick={() => setReceiveUp(false)} className='x top-0 right-2'>&times;</button>
+                <p className="text-white">Recevoir</p>
+                <div className="qr-container flex flex-col items-center p-5">
+                  <QRCode
+                    value={walletaddr}
+                    size={128}
+                    bgColor="#ffffff"
+                    fgColor="#000000"
+                    level="L"
+                  />
+                <p className="address-label mb-4 font-semibold">Adresse:</p>
+                <span className="address font-semibold">{walletaddr}</span>
+                <button onClick={copyWallet} className=" min-h[10px] rounded-xl p-3 flex items-center">
+                <img src="copy.svg" alt="copy" className='w-5 mr-2 bg-g'/>
+                 <p className='font-bold text-white'> Copy </p> 
+                </button>
                 </div>
-     
-                           <button onClick={() => setReceiveUp(true)} className="btnpanel">
-                          Receive
-                        <img src="/scan-barcode.svg" alt="scan" className="imgbtn" />
+              </div>
+            </div>
+          )}
+          <button onClick={() => setSwapUp(true)} className='btnpanel mx-1'>
+            Swap
+            <img src="swap.svg" alt="swap" className='imgbtn' />
+          </button>
+          {swapUp && (
+            <div className='popup-touch'>
+              <div className='popup-content relative'>
+                <h2 className="font-bold mb-15">Swap</h2>
+                <button onClick={() => setSwapUp(false)} className='x top-0 right-2'>&times;</button>
+                <div className="justify-center items-center space-y-7">
+                  <div className='bg-gray-800 w-100 min-h-[100px] rounded-lg items-center flex space-x-0 relative'>
+                    <div className='flex absolute top-0 left-0 mx-5 space-x-2'>
+                      <p className='text-gray-500'>Buying</p>
+                    </div>
+                    <select name="" id="" className=' bg-gray-700 rounded-lg flex w-20 min-h-[40px]'>
+                      <option value="">WETH</option>
+                      <option value="">USDC</option>
+                    </select>
+                    <div className="items-center justify-between flex">
+                      <input type="text" placeholder='0.00' className='bg-transparent text-right text-2xl outline:none w-70'
+                        onChange={(e) => setMontantSwap(e.target.value)}
+                      />
+                     </div>
+                   </div>
+                  <button className='cursor-pointer'>
+                        <img src="/swap.svg" alt="" className=' w-10 inline-flex rounded-full' />
                       </button>
-                    {receiveUp && (
-                      <div className="popup-touch">
-                        <div className="popup-content">
-                            
-                            <p className=" text-white ">Recevoir</p>
-                              <div className="qr-container flex flex-col items-center p-5">
-                             <QRCode
-                              value={walletaddr}
-                              size={128}
-                              bgColor="#ffffff"
-                              fgColor="#000000"
-                              level="L"
-                            />
-                          </div>
-                          <button onClick={() => setReceiveUp(false)} className="x">x</button>
-                          <p className="address-label mb-4 font-semibold">Adresse:</p>
-                          <span className="address font-semibold">{walletaddr}</span>
-                          <button onClick={copyWallet} className="copy-btn bg-gray-500 rounded-xl p-3">
-                            Copier l'URL
-                          </button>
+                        <div className='bg-gray-700 w-100 min-h-[100px] rounded-lg items-center flex space-x-0 relative'>
+                       <div className='flex absolute top-0 mx-5'>
+                        <p className='text-gray-500'>Selling</p>
+                         </div>
+                      <select name="" id="" className='bg-gray-800 rounded-lg flex w-20 min-h-[40px]'>
+                      <option value=""> WETH</option>
+                      <option value="">USDC</option>
+                      </select>
+                      <div className="items-center justify-between flex"> 
+                      <input type="text" placeholder='0.00' className='bg-transparent text-right text-2xl outline:none w-70'
+                      onChange={(e) => setMontantSwap(e.target.value)}
+                       />
                         </div>
-                      </div>
-                    )}    
-              <button onClick={() => setSwapUp(true)} className='btnpanel mx-1'>
-                Swap
-                 <img src="swap.svg" alt="swap" className='imgbtn'/>
-                    </button>
-                   { swapUp && (
-                     <div className=' popup-touch'>
-                       <div className= 'popup-content relative'>             
-                       <h2 className=" font-bold">Swap</h2>
-                        <button
-                         onClick= {() => setSwapUp(false) } className='x'>
-                              x 
-                              </button>
-                            <div className=''>
-                            <a className='font-semibold text-gray-500 leading-none flex whitespace-nowrap '> Pay: </a>
-                              <input type="text" placeholder='0.00$' className='border-2 border-gray-300 rounded px-3 py-2 bg-gray-700 text-white text-right'
-                              />
-                              </div>
-                              <div className='flex justify-center'>
-                              <button className='cursor-pointer' >
-                              <img src="/swap.svg" alt="" className='w-10 h-10 inline-flex rounded-full'/>
-                              </button>
-                                <button className=' buttongreen bottom-3 absolute px-5 cursor-pointer py-2 outline-2 focus:outline rounded-xl'>
-                              Swap  
-                              </button>
-                              </div>   
-
-                            <div className=''>
-                            <a className=' text-gray-500 font-semibold leading-none flex whitespace-nowrap'> Receive: </a>
-                            <input type="text" placeholder='0.00$' className='border-2 border-gray-300 p-4 rounded text-white mb-10 text-right py-2 px-3 bg-gray-700'
-                            onChange={(e) => setMontantSwap(e.target.value)}
-                            />
-              
-                          <button
-                          onClick= {() => setSwapUp(false) } className='x'>
-                              x
+                          </div>
+                        <button className=' flex mx-42 buttongreen bottom-3 absolute px-5 cursor-pointer py-2 outline-2 focus:outline rounded-xl'>
+                         Swap  
                           </button>
-                         
-                            </div>
-                          </div>      
-                      </div>
+                        </div>   
+                      </div>      
+                    </div>
                         )}
                       <button
                           onClick={() => setOngletUp(true)} className="btnpanel">
                           Envoyer
                           <img src="send.svg" alt="send" className='imgbtn' />
-                      </button>
+                      </button>        
             {Ongletup && (
-                <div className=" fixed inset-0  bg-opacity-50 flex items-center justify-center z-50">
-                <div className="lalacolor rounded-xl p-6 mx-auto shadow-xl relative">
+                <div className="popup-touch">
+                <div className="popup-content relative">
                 <h2 className="text-xl font-bold mb-4 text-gray-500">Envoyer des ETH</h2>
                   <div className="flex justify-center items-center space-x-2 ">      
                   <button onClick={envoyerETH}
-                      
                   className="buttongreen" >
                      Envoyer
                      </button>
@@ -327,7 +329,7 @@ const App: React.FC = () => {
                 onChange={(e) => setDestinataire(e.target.value)} />
               <button
             onClick={() => setOngletUp(false)}
-            className="x" >
+            className="x top-0 right-2" >
             &times;
           </button>
           </div>

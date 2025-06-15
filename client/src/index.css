@@ -145,8 +145,7 @@ p {
   border: none;
   font-weight: bold;
   font-size: 1.5rem;
-  top: 0.5rem;
-  right: 0.7rem;
+ 
 }
 
 .x:hover {
@@ -175,12 +174,21 @@ p {
   background-color: #1a1a1a;
   color: white;
   padding: 2rem; 
-  border-radius: 3rem;  
+  border-radius: 1rem;  
   width: 100%;
-  max-width: 28rem; 
+  max-width: 30rem; 
 }
 
+.popup-receive {
 
+   animation: popup 0.5s ease-out;
+  transition: all 0.3s ease;
+  background-color: #1a1a1a;
+  padding: 2rem;
+  width: 100%;
+  max-width: 28rem;
+ border-radius: 1rem;
+}
 
 @keyframes popup {
   from {

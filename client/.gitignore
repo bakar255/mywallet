@@ -32,4 +32,4 @@ yarn-debug.log*
 yarn-error.log*
 
 
-/apiKey.env
+/import.meta.env.VITE_ETHERSCAN_API_KEY
