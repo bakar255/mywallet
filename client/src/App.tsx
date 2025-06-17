@@ -27,7 +27,8 @@ const App: React.FC = () => {
   const [swapUp, setSwapUp] = useState(false);
   const [MenuUp, setMenuUp] = useState(false);
   const [receiveUp, setReceiveUp] = useState(false);
-  const [montantSwap, setMontantSwap] = useState("")
+  const [montantBuySwap, setMontantBuySwap] = useState("")
+  const [montantSellSwap, setMontantSellSwap] = useState("")
   const [loading, setLoading] = useState(false);
   const [mmbox, setMmbox] = useState ('activités');
   const [account, setAccount] = useState<string | null>(null);
@@ -65,7 +66,7 @@ const App: React.FC = () => {
     return [];
   }
 };
-        // Dropdown Accounts
+        // Dropdown Accounts Effects
 
         useEffect(() => {
         if (!account) return;
@@ -93,7 +94,7 @@ const App: React.FC = () => {
       alert('Please install MetaMask!');
       return;
     }
-    if (!montantSwap || isNaN(Number(montantSwap))) {
+    if (!montantBuySwap || isNaN(Number(montantBuySwap))) {
       alert('Enter a valid amount');
       return;
     }
@@ -102,7 +103,7 @@ const App: React.FC = () => {
     try {
       const provider = new ethers.BrowserProvider(window.ethereum);
       const signer = await provider.getSigner();
-      await getQuote(provider, montantSwap);
+      await getQuote(provider, montantBuySwap);
       alert('Swap successful!');
     } catch (error) {
       console.error(error);
@@ -144,6 +145,7 @@ const App: React.FC = () => {
     setConnecter(false)
     toast.error("Votre Wallet est déconnecter")
     setWalletAddr("");
+    setAccount("");
 
    }
      // Btn Copy-Paste Wallet
@@ -365,7 +367,7 @@ return (
                         type="text"
                         placeholder="0.00"
                         className="bg-transparent text-right text-2xl outline:none w-70"
-                        onChange={(e) => setMontantSwap(e.target.value)}
+                        onChange={(e) => setMontantBuySwap(e.target.value)}
                       />
                     </div>
                   </div>
@@ -387,7 +389,7 @@ return (
                         type="text"
                         placeholder="0.00"
                         className="bg-transparent text-right text-2xl outline:none w-70"
-                        onChange={(e) => setMontantSwap(e.target.value)}
+                        onChange={(e) => setMontantSellSwap(e.target.value)}
                       />
                     </div>
                   </div>
@@ -410,10 +412,10 @@ return (
 
           {Ongletup && (
             <div className="popup-touch">
-              <div className="popup-content relative">
-                <h2 className="text-xl font-bold mb-4 text-gray-500">Envoyer des ETH</h2>
-                <div className="flex justify-center items-center space-x-2 ">
-                  <button onClick={envoyerETH} className="buttongreen">
+              <div className="min-h-[250px] mx-auto w-100 lalacolor relative rounded-lg py-3">
+                <h2 className="text-xl font-bold mb-4 text-gray-500">Send</h2>
+                 <div className="flex flex-col justify-center items-center space-y-6 ">
+                  <button onClick={envoyerETH} className="buttongreen absolute bottom-0">
                     Envoyer
                   </button>
                   <input
