@@ -1,31 +1,34 @@
-# MyWallet    ⛏️
+# MyWallet    
 
 ## Description
 
-MyWallet D&R est une application web React permettant de gérer un portefeuille Ethereum.  
-Elle permet de connecter un wallet, afficher le solde, recevoir des fonds via QR code, envoyer des ETH, et effectuer des swaps entre tokens.
+MyWallet D&R is a React web application that allows you to manage an Ethereum wallet.
+It lets you connect your wallet, view your balance, receive funds via QR code, send ETH, and perform simple token swaps.
+Features
 
 ## Fonctionnalités
 
-- Connexion / déconnexion du wallet  
-- Affichage du solde ETH  🌐
-- Génération d’un QR code pour recevoir des fonds 💰
-- Envoi d’ETH vers une adresse spécifique  ✔️
-- Swap simple entre tokens (WETH, USDC)  🔁
-- Changement de réseau (Sepolia, Mainnet)  ⚡
+- Connect / disconnect wallet 🔐
+- Display ETH balance 🌐
+- Generate a QR code to receive funds 💰
+- Send ETH to a specific address ✔️
+- Simple token swaps (WETH, USDC) 🔁
+- Switch networks (Sepolia, Mainnet) ⚡
 
 
 ## Installation
 
-1. Cloner le dépôt  
+1. Clone the repository
 ```bash
-git clone <>
+git clone <git@github.com:OfOluo/mywallet.git>
 
-2. Installer les dépendances
+2. Install dependencies
 ```bash
 npm install
 
-3. Démarrer l'application en local
+3. Run the app locally
 ```bash
 npm run dev
+
+
 
