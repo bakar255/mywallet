@@ -15,6 +15,7 @@ Features
 - Simple token swaps (WETH, USDC) 🔁
 - Switch networks (Sepolia, Mainnet) ⚡
 
+![alt text](image.png)
 
 ## Installation
 
