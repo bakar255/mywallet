@@ -243,7 +243,7 @@ const App: React.FC = () => {
   } catch (e) {
     console.error('Erreur lors du formatage de la valeur:', e);
   }
-  
+
 })}
 
 }
@@ -450,17 +450,7 @@ return (
               {mmbox === "activités" && (
                 <div>
                   <h4>Activité </h4>
-                    {transactions.length === 0 ? (
-                        <p>Aucune transaction trouvée.</p>
-                      ) : (
-                        <ul>
-                         { transactions.map((tx, index) => (
-                            <li key={index}>
-                              Hash: {tx.hash} - Montant: {parseFloat(tx.value) / 1e18} ETH
-                            </li>
-                          ))}
-                        </ul>
-                      )}
+                  
                 </div>
               )}
               {mmbox === "jetonsNFT" && (
