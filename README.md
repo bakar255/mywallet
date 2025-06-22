@@ -4,7 +4,7 @@
 
 MyWallet D&R is a React web application that allows you to manage an Ethereum wallet.
 It lets you connect your wallet, view your balance, receive funds via QR code, send ETH, and perform simple token swaps.
-Features
+
 
 ## Fonctionnalités
 
