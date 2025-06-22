@@ -179,7 +179,6 @@ const App: React.FC = () => {
   }
 };
 
-
 // Send funds 
 
       const envoyerETH = async () => {
@@ -244,12 +243,7 @@ const App: React.FC = () => {
   } catch (e) {
     console.error('Erreur lors du formatage de la valeur:', e);
   }
-
-  return (
-    <li key={tx?.hash || index}>
-      Vers : {toAddress} • {amount}
-    </li>
-  );
+  
 })}
 
 }
@@ -490,8 +484,6 @@ return (
       </div>
     </div>
   </div>
-
- 
 
      )}
 
