@@ -7,11 +7,6 @@ import toast, { Toaster } from 'react-hot-toast';
 // import { QRCode } from 'qrcode.react';
 import QRCode from "react-qr-code";
 import 'react-toastify/dist/ReactToastify.css';
-import { getQuote } from './uniswap';
-
-
-
-const apiKey = import.meta.env.VITE_ETHERSCAN_API_KEY;
 
 
 const App: React.FC = () => { 
@@ -37,7 +32,7 @@ const App: React.FC = () => {
    const addrslice = (addr) => {
    return addr ? `${addr.slice(0, 4)}...${addr.slice(-3)}` : '';}
 
-  const geremmbox = (tab) => {
+   const geremmbox = (tab) => {
   setMmbox(tab)}
 
   const mmonglets = ['activités', 'jetonsNFT', 'assets']
@@ -45,25 +40,32 @@ const App: React.FC = () => {
   const notify = () => toast('Toast');
 
     // API
+   const apiKey = "";
+
+
   const getTransactions = async (adresse: string) => {
   try {
-     
-      const response = await axios.get(`https://api.etherscan.io/api`, {
+    const response = await axios.get("https://api.etherscan.io/api", {
       params: {
         module: "account",
         action: "txlist",
-        address: adresse,
+        address: "0x4675C7e5BaAFBFFbca748158bEcBA61ef3b0a263",
         startblock: 0,
         endblock: 99999999,
         sort: "desc",
-        apikey: apiKey,
-      }
+        apikey: "GUUTS1ESGKBRYHFT7Y2W5VS16TNNVETHMX"
+      },
     });
+       console.log("Réponse API :", response.data); 
 
-    return response.data.result; 
+    if (response.data.status === "1") {
+      setTransactions(response.data.result);
+      
+    } else {
+      console.error("Error API :", response.data.message);
+    }
   } catch (error) {
     console.error("Erreur lors de la récupération des transactions :", error);
-    return [];
   }
 };
         // Dropdown Accounts Effects
@@ -250,10 +252,10 @@ const App: React.FC = () => {
   );
 })}
 
-
 }
 
    /////////////////////////////////////////////////////////////
+
 return (
   <div className="min-h-screen flex-col bg-sky-800">
     <header>
@@ -352,7 +354,6 @@ return (
                 <button onClick={() => setSwapUp(false)} className="x top-0 right-2">
                   &times;
                 </button>
-
                 <div className="justify-center items-center space-y-7">
                   <div className="bg-gray-800 w-100 min-h-[100px] rounded-lg items-center flex space-x-0 relative">
                     <div className="flex absolute top-0 left-0 mx-5 space-x-2">
@@ -371,11 +372,9 @@ return (
                       />
                     </div>
                   </div>
-
                   <button className="cursor-pointer">
                     <img src="/swap.svg" alt="" className="w-10 inline-flex rounded-full" />
                   </button>
-
                   <div className="bg-gray-700 w-100 min-h-[100px] rounded-lg items-center flex space-x-0 relative">
                     <div className="flex absolute top-0 mx-5">
                       <p className="text-gray-500">Selling</p>
@@ -393,7 +392,6 @@ return (
                       />
                     </div>
                   </div>
-
                   <button
                     onClick={handleSwap}
                     className="flex mx-42 buttongreen bottom-3 absolute px-5 cursor-pointer py-2 outline-2 focus:outline rounded-xl"
@@ -404,12 +402,10 @@ return (
               </div>
             </div>
           )}
-
           <button onClick={() => setOngletUp(true)} className="btnpanel">
             Envoyer
             <img src="send.svg" alt="send" className="imgbtn" />
           </button>
-
           {Ongletup && (
             <div className="popup-touch">
               <div className="min-h-[250px] mx-auto w-100 lalacolor relative rounded-lg py-3">
@@ -440,9 +436,7 @@ return (
             </div>
           )}
         </div>
-
         <div className="border-2 border-solid border-gray-400 rounded-lg relative"></div>
-
         <div className="mm-box tabs inline-block">
           <ul className="justify-center tabsul">
             <button onClick={() => geremmbox("activités")} className="tabitem">
@@ -456,13 +450,23 @@ return (
             </button>
           </ul>
         </div>
-
         <div>
           <span>
             <div className="onglet-container shadow bg-gray-700">
               {mmbox === "activités" && (
                 <div>
                   <h4>Activité </h4>
+                    {transactions.length === 0 ? (
+                        <p>Aucune transaction trouvée.</p>
+                      ) : (
+                        <ul>
+                         { transactions.map((tx, index) => (
+                            <li key={index}>
+                              Hash: {tx.hash} - Montant: {parseFloat(tx.value) / 1e18} ETH
+                            </li>
+                          ))}
+                        </ul>
+                      )}
                 </div>
               )}
               {mmbox === "jetonsNFT" && (
