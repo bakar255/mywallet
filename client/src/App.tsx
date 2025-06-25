@@ -7,6 +7,8 @@ import toast, { Toaster } from 'react-hot-toast';
 // import { QRCode } from 'qrcode.react';
 import QRCode from "react-qr-code";
 import 'react-toastify/dist/ReactToastify.css';
+import { createSwapTransaction, USDC, WETH, getExchangeRate, getRealRate } from './components/uniswap'
+ import { Token } from '@uniswap/sdk-core';
 
 
 const App: React.FC = () => { 
@@ -22,13 +24,16 @@ const App: React.FC = () => {
   const [swapUp, setSwapUp] = useState(false);
   const [MenuUp, setMenuUp] = useState(false);
   const [receiveUp, setReceiveUp] = useState(false);
-  const [montantBuySwap, setMontantBuySwap] = useState("")
-  const [montantSellSwap, setMontantSellSwap] = useState("")
+  const [amountIn, setAmountIn] = useState("");
+  const [provider, setProvider] = useState<ethers.BrowserProvider | null>(null)
+  const [amountOut, setAmountOut] = useState("");
+  const [tokenIn, setTokenIn] = useState<Token>(WETH);
+  const [tokenOut, setTokenOut] = useState<Token>(USDC)
   const [loading, setLoading] = useState(false);
   const [mmbox, setMmbox] = useState ('activités');
   const [account, setAccount] = useState<string | null>(null);
   const [accounts, setAccounts] = useState([]);
-  
+
    const addrslice = (addr) => {
    return addr ? `${addr.slice(0, 4)}...${addr.slice(-3)}` : '';}
 
@@ -91,34 +96,10 @@ const App: React.FC = () => {
 
   };
 
-   async function handleSwap() {
-    if (!window.ethereum) {
-      alert('Please install MetaMask!');
-      return;
-    }
-    if (!montantBuySwap || isNaN(Number(montantBuySwap))) {
-      alert('Enter a valid amount');
-      return;
-    }
-   
-       setLoading(true);
-    try {
-      const provider = new ethers.BrowserProvider(window.ethereum);
-      const signer = await provider.getSigner();
-      await getQuote(provider, montantBuySwap);
-      alert('Swap successful!');
-    } catch (error) {
-      console.error(error);
-      alert('Swap failed');
-    } finally {
-      setLoading(false);
-    }
-   }
-
   // Connect my wallet
 
       const connecterWallet = async () => {
-      await new Promise((r) => setTimeout(r, 1000));
+      await new Promise((r) => setTimeout(r, 200));
       if (typeof window.ethereum !== 'undefined') {
       const provider = new ethers.BrowserProvider(window.ethereum);
       const access = await window.ethereum.request({ method: 'eth_requestAccounts' });
@@ -139,7 +120,8 @@ const App: React.FC = () => {
   }
    // Disconnect the Wallet
   
-    const deconnecterWallet = () => {
+    const deconnecterWallet = async () => {
+    await new Promise((r) => setTimeout(r, 200));
     setAdresse("");
     setSolde("");
     setTransactions([]);
@@ -148,27 +130,57 @@ const App: React.FC = () => {
     toast.error("Votre Wallet est déconnecter")
     setWalletAddr("");
     setAccount("");
-
    }
-     // Btn Copy-Paste Wallet
-     const copyWallet = () => {
-      navigator.clipboard.writeText(walletaddr)
-        .then(() => {
-          toast.success('Adresse copiée dans le presse-papiers !');
-        })
-        .catch(err => {
-          toast.error('Erreur lors de la copie : ', err);
-        });
-      }
 
-      // Network
+  const handleSwap = async () => {
+
+  if (!window.ethereum) {
+    alert("Installez MetaMask !");
+    return;
+  }
+
+  if (!amountIn || Number(amountIn) <= 0) {
+    alert("Entrez un montant valide");
+    return;
+  }
+
+  try {
+    // Initialisation
+    const provider = new ethers.BrowserProvider(window.ethereum);
+    const signer = await provider.getSigner();
+
+    //  (WETH → USDC)
+    const tokenIn = WETH;
+    const tokenOut = USDC;
+    const amountInWei = ethers.parseEther(amountIn); // ETH to wei
+
+    // 3. 
+    const tx = await signer.sendTransaction({
+      to: "0xE592427A0AEce92De3Edee1F18E0157C05861564", 
+      value: amountInWei,
+      data: "0x" // 
+    });
+
+    console.log("Transaction envoyée :", tx.hash);
+    alert("Swap en cours !");
+
+  } catch (error) {
+    console.error("Erreur :", error);
+    alert("Échec : " + (error instanceof Error ? error.message : "Voir la console"));
+  }
+}; 
+      // Network change by ChainId
     const handleNetworkChange = async (network: string) => {
   try {
     let chainId;
     if (network === "sepolia") {
       chainId = "0xaa36a7"; // Sepolia en hex
+      deconnecterWallet(); 
+      toast.error('Disconnected, Changing Network')
     } else if (network === "mainnet") {
       chainId = "0x1"; // Ethereum Mainnet en hex
+      deconnecterWallet(); 
+      toast.error('Disconnected, Changing Network')
     }
     await window.ethereum.request({
       method: "wallet_switchEthereumChain",
@@ -179,7 +191,39 @@ const App: React.FC = () => {
   }
 };
 
-// Send funds 
+// Intiliation AmountOut
+
+useEffect(() => {
+  const estimate = async () => {
+    if (!amountIn || !tokenIn || !tokenOut) {
+      setAmountOut("");
+      return;
+    }
+
+    try {
+      // Utilisez votre fonction existante ou cette version simplifiée :
+      const rate = await getExchangeRate(tokenIn, tokenOut); // À implémenter
+      setAmountOut((Number(amountIn) * rate).toFixed(1));
+    } catch {
+      setAmountOut("Error");
+    }
+  };
+
+  estimate();
+}, [amountIn, tokenIn, tokenOut]);
+
+
+     // Navigator copy-text wallet
+       const copyWallet = () => {
+      navigator.clipboard.writeText(walletaddr)
+        .then(() => {
+          toast.success('Adresse copiée dans le presse-papiers !');
+        })
+        .catch(err => {
+          toast.error('Erreur lors de la copie : ', err);
+            });
+      }
+    // Send funds 
 
       const envoyerETH = async () => {
     if (!estConnecte) {
@@ -205,13 +249,14 @@ const App: React.FC = () => {
       console.log(`Transaction envoyée ! Hash: ${tx.hash}`)
 
       const txs = await getTransactions(adresse)
-      setTransactions(txs)
+      setTransactions(tx)
       await getSolde(adresse, provider)
 
     } catch (error: any) {
       console.error("Erreur en envoyant l'ETH:", error)
       toast.error("Erreur lors de l'envoi : " + error.message)
     }
+
 
   const GetAddr = async () => {
   if (!estConnecte) {
@@ -243,15 +288,14 @@ const App: React.FC = () => {
   } catch (e) {
     console.error('Erreur lors du formatage de la valeur:', e);
   }
-
+ 
 })}
 
 }
-
    /////////////////////////////////////////////////////////////
 
 return (
-  <div className="min-h-screen flex-col bg-sky-800">
+  <div className="min-h-screen flex-col lalacolor">
     <header>
       <Toaster />
       <nav className="px-4 py-3 navbar navbar-expand-lg navbar-light py-lg-0">
@@ -260,12 +304,11 @@ return (
           <div className="space-x-2">
             <button className="px-2 rounded-lg cursor-pointer"></button>
             <button
-              className="buttongreen"
-              onClick={estConnecte ? deconnecterWallet : connecterWallet}
-            >
+              className={estConnecte ? 'bg-red-500 text-white rounded-lg px-3 py-2' : 'bg-green-700 text-white rounded-lg px-3 py-2' }
+              onClick={estConnecte ? deconnecterWallet : connecterWallet} >
               {estConnecte ? "Déconnecter" : "Connecter"}
             </button>
-            <select
+             <select
               value={account ?? ""}
               onChange={(e) => setAccount(e.target.value)}
               className="bg-gray-600 text-white px-2 py-3 rounded-lg font-semibold"
@@ -288,15 +331,11 @@ return (
             name=""
             id="network"
             className="absolute top-2 right-3 rounded-lg flex w-20 min-h-[40px] bg-gray-500"
-            onChange={(e) => handleNetworkChange(e.target.value)}
-          >
-            <option value="sepolia">
-              Sepolia
+            onChange={(e) => handleNetworkChange(e.target.value)}>
               <img src="arrow.svg" alt="arrow" className="w-10" />
-            </option>
-            <option value="mainnet">Mainnet</option>
+             <option value="mainnet"> Mainnet</option>
+            <option value="sepolia">Sepolia</option>
           </select>
-
           <span className="whitespace-nowrap text-shadow-xs text-gray-500 font-semibold leading-none mt-1">
             {solde}ETH
           </span>
@@ -351,18 +390,20 @@ return (
                 <div className="justify-center items-center space-y-7">
                   <div className="bg-gray-800 w-100 min-h-[100px] rounded-lg items-center flex space-x-0 relative">
                     <div className="flex absolute top-0 left-0 mx-5 space-x-2">
-                      <p className="text-gray-500">Buying</p>
+                      <p className="text-gray-500">Amount:</p>
                     </div>
-                    <select name="" id="" className="bg-gray-700 rounded-lg flex w-20 min-h-[40px]">
+                    <select name="" id="" className="bg-gray-700 rounded-lg flex w-20 min-h-[40px]"
+                      value={tokenIn.symbol}
+                       onChange={(e) => setTokenIn(e.target.value === 'WETH' ? WETH : USDC)}>
                       <option value="">WETH</option>
-                      <option value="">USDC</option>
-                    </select>
-                    <div className="items-center justify-between flex">
+                     </select>
+                     <div className="items-center justify-between flex">
                       <input
                         type="text"
                         placeholder="0.00"
                         className="bg-transparent text-right text-2xl outline:none w-70"
-                        onChange={(e) => setMontantBuySwap(e.target.value)}
+                        value={amountIn}
+                        onChange={(e) => setAmountIn(e.target.value)}
                       />
                     </div>
                   </div>
@@ -371,27 +412,21 @@ return (
                   </button>
                   <div className="bg-gray-700 w-100 min-h-[100px] rounded-lg items-center flex space-x-0 relative">
                     <div className="flex absolute top-0 mx-5">
-                      <p className="text-gray-500">Selling</p>
+                      <p className="text-gray-500">Amount:</p>
                     </div>
                     <select name="" id="" className="bg-gray-800 rounded-lg flex w-20 min-h-[40px]">
-                      <option value="">WETH</option>
                       <option value="">USDC</option>
                     </select>
                     <div className="items-center justify-between flex">
                       <input
                         type="text"
-                        placeholder="0.00"
+                        value={amountOut}
+                        placeholder='0.00'
                         className="bg-transparent text-right text-2xl outline:none w-70"
-                        onChange={(e) => setMontantSellSwap(e.target.value)}
                       />
                     </div>
                   </div>
-                  <button
-                    onClick={handleSwap}
-                    className="flex mx-42 buttongreen bottom-3 absolute px-5 cursor-pointer py-2 outline-2 focus:outline rounded-xl"
-                  >
-                    Swap
-                  </button>
+                   <button onClick={handleSwap}disabled={!amountIn} className={`w-25 py-3 rounded-xl font-bold ${!amountIn ? 'bg-gray-600' : 'bg-green-500 hover:bg-green-600'  }`}>Swap</button>
                 </div>
               </div>
             </div>
