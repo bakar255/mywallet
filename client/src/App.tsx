@@ -1,4 +1,4 @@
-import { BrowserProvider, ethers, Wallet } from 'ethers'
+import { BrowserProvider, ethers, formatEther, Wallet } from 'ethers'
 import './App.css'
 import './index.css'
 import { useState, useEffect } from 'react'
@@ -7,7 +7,7 @@ import toast, { Toaster } from 'react-hot-toast';
 // import { QRCode } from 'qrcode.react';
 import QRCode from "react-qr-code";
 import 'react-toastify/dist/ReactToastify.css';
-import { createSwapTransaction, USDC, WETH, getExchangeRate, getRealRate } from './components/uniswap'
+import { createSwapTransaction, USDC, WETH, getExchangeRate} from './components/uniswap'
  import { Token } from '@uniswap/sdk-core';
 
 
@@ -33,6 +33,8 @@ const App: React.FC = () => {
   const [mmbox, setMmbox] = useState ('activités');
   const [account, setAccount] = useState<string | null>(null);
   const [accounts, setAccounts] = useState([]);
+  const [soldeEth, setSoldeEth] = useState("");
+  const [soldeSep, setSoldeSep] = useState("");
 
    const addrslice = (addr) => {
    return addr ? `${addr.slice(0, 4)}...${addr.slice(-3)}` : '';}
@@ -45,34 +47,46 @@ const App: React.FC = () => {
   const notify = () => toast('Toast');
 
     // API
-   const apiKey = "";
+
+   interface EthereumTransaction {
+  blockNumber: string;
+  timeStamp: string;
+  hash: string;
+  from: string;
+  to: string;
+  value: string; 
+  gas: string;
+  gasPrice: string;
+  gasUsed: string;
+  isError: string;
+  txreceipt_status: string;
+}
 
 
-  const getTransactions = async (adresse: string) => {
+const getTransactions = async (address: string) => {
   try {
     const response = await axios.get("https://api.etherscan.io/api", {
       params: {
         module: "account",
         action: "txlist",
-        address: "0x4675C7e5BaAFBFFbca748158bEcBA61ef3b0a263",
-        startblock: 0,
-        endblock: 99999999,
+        address: address,
         sort: "desc",
         apikey: "GUUTS1ESGKBRYHFT7Y2W5VS16TNNVETHMX"
       },
     });
-       console.log("Réponse API :", response.data); 
 
     if (response.data.status === "1") {
       setTransactions(response.data.result);
-      
-    } else {
-      console.error("Error API :", response.data.message);
     }
   } catch (error) {
-    console.error("Erreur lors de la récupération des transactions :", error);
+    console.error("Erreur:", error);
   }
 };
+
+useEffect(() => {
+  getTransactions("0x4675C7e5BaAFBFFbca748158bEcBA61ef3b0a263");
+}, []);
+  
         // Dropdown Accounts Effects
 
         useEffect(() => {
@@ -87,12 +101,31 @@ const App: React.FC = () => {
       }, [account]);
    
     // Get Solde from Acc
-     const getSolde = async (adresseUser: string, provider: BrowserProvider) => {
-     const balance = await provider.getBalance(adresseUser);
-     const balanceEther = parseFloat(ethers.formatEther(balance));
-     const balanceRond = balanceEther.toFixed(4);
-     setSolde(balanceRond);
-     console.log("Solde ETH :", balanceRond);
+
+    // Fetch raw Balance
+     async function fetchRawBalance(addressUser: string, provider: BrowserProvider): Promise<bigint> {
+        if (!addressUser || !provider) throw new Error("Paramètre unvalided") 
+          return await provider.getBalance(addressUser) 
+      }
+
+      // Set statement and format balance
+     const getSolde = async (addressUser: string, provider: BrowserProvider) => {
+      try {
+        
+        const rawBalance = await fetchRawBalance(addressUser, provider)
+        const balanceRond = formatEth(rawBalance);
+        setSolde(balanceRond);
+        console.log("Solde Eth:", balanceRond);
+        return balanceRond;
+
+      } catch (error) {
+        console.error("", error)     
+      }
+
+      function formatEth(balanceWei: bigint, decimals: number = 4): string {
+        const balanceEther = parseFloat(ethers.formatEther(balanceWei));
+        return balanceEther.toFixed(decimals);
+      }  
 
   };
 
@@ -114,7 +147,7 @@ const App: React.FC = () => {
       setConnecter(true)
       // Api set
       const txs = await getTransactions(adresseUser)
-      setTransactions(txs)
+  
       toast.success("Votre wallet est connecter !")
         }        
   }
@@ -175,17 +208,20 @@ const App: React.FC = () => {
     let chainId;
     if (network === "sepolia") {
       chainId = "0xaa36a7"; // Sepolia en hex
-      deconnecterWallet(); 
+      
       toast.error('Disconnected, Changing Network')
     } else if (network === "mainnet") {
       chainId = "0x1"; // Ethereum Mainnet en hex
-      deconnecterWallet(); 
+      
       toast.error('Disconnected, Changing Network')
     }
     await window.ethereum.request({
       method: "wallet_switchEthereumChain",
       params: [{ chainId }],
     });
+
+    toast.dismiss();
+    toast.success(``)
   } catch (err) {
     console.error("Erreur lors du changement de réseau :", err);
   }
@@ -247,9 +283,7 @@ useEffect(() => {
 
       toast.success(`Transaction envoyée ! Hash: ${tx.hash}`)
       console.log(`Transaction envoyée ! Hash: ${tx.hash}`)
-
       const txs = await getTransactions(adresse)
-      setTransactions(tx)
       await getSolde(adresse, provider)
 
     } catch (error: any) {
@@ -304,7 +338,7 @@ return (
           <div className="space-x-2">
             <button className="px-2 rounded-lg cursor-pointer"></button>
             <button
-              className={estConnecte ? 'bg-red-500 text-white rounded-lg px-3 py-2' : 'bg-green-700 text-white rounded-lg px-3 py-2' }
+              className={estConnecte ? 'bg-red-500 cursor-pointer text-white rounded-lg px-3 py-2' : ' cursor-pointer bg-green-700 text-white rounded-lg px-3 py-2' }
               onClick={estConnecte ? deconnecterWallet : connecterWallet} >
               {estConnecte ? "Déconnecter" : "Connecter"}
             </button>
@@ -361,10 +395,10 @@ return (
                 <button onClick={() => setReceiveUp(false)} className="x top-0 right-2">
                   &times;
                 </button>
-                <p className="text-white">Recevoir</p>
+                <p className="text-white">Receive</p>
                 <div className="qr-container flex flex-col items-center p-5">
                   <QRCode value={walletaddr} size={128} bgColor="#ffffff" fgColor="#000000" level="L" />
-                  <p className="address-label mb-4 font-semibold">Adresse:</p>
+                  <p className="address-label mb-4 font-semibold">Address:</p>
                   <span className="address font-semibold">{walletaddr}</span>
                   <button onClick={copyWallet} className="min-h[10px] rounded-xl p-3 flex items-center">
                     <img src="copy.svg" alt="copy" className="w-5 mr-2 bg-g cursor-pointer" />
@@ -392,7 +426,7 @@ return (
                     <div className="flex absolute top-0 left-0 mx-5 space-x-2">
                       <p className="text-gray-500">Amount:</p>
                     </div>
-                    <select name="" id="" className="bg-gray-700 rounded-lg flex w-20 min-h-[40px]"
+                    <select name="" id="" className="bg-gray-700 rounded-lg w-20 min-h-[40px]"
                       value={tokenIn.symbol}
                        onChange={(e) => setTokenIn(e.target.value === 'WETH' ? WETH : USDC)}>
                       <option value="">WETH</option>
@@ -408,7 +442,7 @@ return (
                     </div>
                   </div>
                   <button className="cursor-pointer">
-                    <img src="/swap.svg" alt="" className="w-10 inline-flex rounded-full" />
+                    <img src="/swap.svg" alt="" className="w-10  rounded-full" />
                   </button>
                   <div className="bg-gray-700 w-100 min-h-[100px] rounded-lg items-center flex space-x-0 relative">
                     <div className="flex absolute top-0 mx-5">
@@ -426,7 +460,7 @@ return (
                       />
                     </div>
                   </div>
-                   <button onClick={handleSwap}disabled={!amountIn} className={`w-25 py-3 rounded-xl font-bold ${!amountIn ? 'bg-gray-600' : 'bg-green-500 hover:bg-green-600'  }`}>Swap</button>
+                   <button onClick={handleSwap}disabled={!amountIn} className={`w-25 p-3 rounded-lg  transition-colors ${ amountIn ? 'bg-green-600 ' : 'bg-gray-500 text-white'}`}>Swap</button>
                 </div>
               </div>
             </div>
@@ -435,30 +469,33 @@ return (
             Envoyer
             <img src="send.svg" alt="send" className="imgbtn" />
           </button>
+          {/* Sends Container */}
           {Ongletup && (
             <div className="popup-touch">
-              <div className="min-h-[250px] mx-auto w-100 lalacolor relative rounded-lg py-3">
-                <h2 className="text-xl font-bold mb-4 text-gray-500">Send</h2>
-                 <div className="flex flex-col justify-center items-center space-y-6 ">
-                  <button onClick={envoyerETH} className="buttongreen absolute bottom-0">
-                    Envoyer
-                  </button>
+              <div className="popup-content relative rounded-lg items-center">
+                <h2 className="text-xl font-bold mb-4 text-gray-500 ">Send ETH</h2>
+                <div className="flex justify-center mb-6"></div>
+                 <div className="flex flex-col justify-center items-center space-y-10 ">
+            
                   <input
                     type="text"
-                    placeholder="Montant Eth"
-                    className="border border-gray-300 rounded-xl px-3 py-2 focus:outline-none bg-gray-700 text-white "
+                    placeholder="Amount"
+                    className="border border-gray-300 rounded-xl px-10 py-3 focus:outline-none bg-gray-700 text-white "
                     value={montant}
                     onChange={(e) => setMontant(e.target.value)}
                   />
                   <input
                     type="text"
-                    placeholder="Adresse"
-                    className="border border-gray-300 rounded-xl px-3 py-2 focus:outline-none bg-gray-700 text-white"
+                    placeholder="Address"
+                    className="border border-gray-300 rounded-xl px-10 py-3 focus:outline-none bg-gray-700 text-white"
                     value={destinataire}
                     onChange={(e) => setDestinataire(e.target.value)}
                   />
                   <button onClick={() => setOngletUp(false)} className="x top-0 right-2">
                     &times;
+                  </button>
+                  <button onClick={envoyerETH} className="buttongreen absolute bottom-0">
+                    Envoyer
                   </button>
                 </div>
               </div>
@@ -483,10 +520,52 @@ return (
           <span>
             <div className="onglet-container shadow bg-gray-700">
               {mmbox === "activités" && (
-                <div>
-                  <h4>Activité </h4>
-                  
-                </div>
+                  <div className="space-y-2 max-h-[500px] overflow-y-auto">
+                    {transactions.map((tx) => (
+                      <div key={tx.hash} className="p-3 bg-gray-800 rounded-lg">
+                        <div className="flex justify-between">
+                          <span className="text-sm text-gray-400">
+                            {tx.date}
+                          </span>
+                          <span className={`text-xs px-2 py-1 rounded ${
+                            tx.isError === "1" ? "bg-red-500" : "bg-green-500"
+                          }`}>
+                            {tx.isError === "1" ? "Échec" : "Succès"}
+                          </span>
+                        </div>
+                        
+                        <div className="mt-2">
+                          <p className="text-sm">
+                            <span className="text-gray-500">De :</span> 
+                            {`${tx.from.slice(0, 6)}...${tx.from.slice(-4)}`}
+                          </p>
+                          <p className="text-sm">
+                            <span className="text-gray-500">À :</span>
+                            {`${tx.to.slice(0, 6)}...${tx.to.slice(-4)}`}
+                          </p>
+                        </div>
+
+                        <div className="flex justify-between mt-2">
+                          <span className="font-medium">
+                            {parseFloat(tx.valueEth).toFixed(4)} ETH
+                          </span>
+                          <span className="text-gray-400 text-sm">
+                            Frais : {parseFloat(tx.gasCostEth).toFixed(6)} ETH
+                          </span>
+                        </div>
+
+                        <a 
+                          href={`https://etherscan.io/tx/${tx.hash}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-block mt-2 text-blue-400 text-xs"
+                        >
+                          Voir sur Etherscan
+                        </a>
+                      </div>
+                    ))}
+                  </div>
+
               )}
               {mmbox === "jetonsNFT" && (
                 <div>
@@ -495,7 +574,16 @@ return (
               )}
               {mmbox === "assets" && (
                 <div>
-                  <h4>Assets </h4>
+                  <h4>Assets</h4>
+                  <div className='flex-col container-assets p-4 mb-4 '>
+                    <div className='flex items-center justify-between'>
+                       <div className='flex items-center space-x-3'> 
+                         <img src="eth_logo.svg" alt="ethlogo" className='w-10' />
+                        <a className=''>Ethereum</a>
+                         </div>
+                        <a className='text-right'>0.00$</a>
+                     </div>
+                  </div>
                 </div>
               )}
             </div>

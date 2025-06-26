@@ -90,7 +90,7 @@ export async function createSwapTransaction(
 
   // 5. 
   const slippageTolerance = new Percent(
-    Math.round(slippageTolerancePercent * 100),
+    Math.round(slippageTolerance * 100),
     10_000
   ); // ex: 0.5% = 50/10000
 
@@ -116,7 +116,7 @@ export async function createSwapTransaction(
 
 export async function getExchangeRate(tokenA: Token, tokenB: Token) {
 
-  return 1800; //  1 ETH = 1800 USDC
+  return 2076; //  1 ETH = 2076 USDC // Fictif price
 }
 
  {/* export async function getRealRate(tokenIn: Token, tokenOut: Token, provider: ethers.Provider) {
