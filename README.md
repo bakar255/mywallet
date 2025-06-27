@@ -15,13 +15,13 @@ It lets you connect your wallet, view your balance, receive funds via QR code, s
 - Simple token swaps (WETH, USDC) 🔁
 - Switch networks (Sepolia, Mainnet) ⚡
 
-<img src="image.png" alt="alt text" width="600"/>
+<img src="walletview.PNG" alt="alt text" width="600"/>
 
 ## Installation
 
 1. Clone the repository
 
-git clone 
+git clone
 
 2. Install dependencies
 
