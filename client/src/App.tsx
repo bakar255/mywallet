@@ -9,6 +9,7 @@ import QRCode from "react-qr-code";
 import 'react-toastify/dist/ReactToastify.css';
 import { createSwapTransaction, USDC, WETH, getExchangeRate} from './components/uniswap'
  import { Token } from '@uniswap/sdk-core';
+ import { AiOutlineQrcode } from "react-icons/ai";
 
 
 const App: React.FC = () => { 
@@ -163,7 +164,8 @@ useEffect(() => {
     toast.error("Votre Wallet est déconnecter")
     setWalletAddr("");
     setAccount("");
-   }
+  
+  }
 
   const handleSwap = async () => {
 
@@ -388,7 +390,7 @@ return (
             Receive
             <img src="/scan-barcode.svg" alt="scan" className="imgbtn" />
           </button>
-
+       {/* Qr Code Container */}
           {receiveUp && (
             <div className="popup-touch">
               <div className="popup-receive relative flex flex-col">
@@ -413,7 +415,7 @@ return (
             Swap
             <img src="swap.svg" alt="swap" className="imgbtn" />
           </button>
-
+          {/* Swap Container */}
           {swapUp && (
             <div className="popup-touch">
               <div className="popup-content relative">
@@ -471,32 +473,48 @@ return (
           </button>
           {/* Sends Container */}
           {Ongletup && (
-            <div className="popup-touch">
-              <div className="popup-content relative rounded-lg items-center">
-                <h2 className="text-xl font-bold mb-4 text-gray-500 ">Send ETH</h2>
-                <div className="flex justify-center mb-6"></div>
-                 <div className="flex flex-col justify-center items-center space-y-10 ">
-            
-                  <input
-                    type="text"
-                    placeholder="Amount"
-                    className="border border-gray-300 rounded-xl px-10 py-3 focus:outline-none bg-gray-700 text-white "
-                    value={montant}
-                    onChange={(e) => setMontant(e.target.value)}
-                  />
-                  <input
-                    type="text"
-                    placeholder="Address"
-                    className="border border-gray-300 rounded-xl px-10 py-3 focus:outline-none bg-gray-700 text-white"
-                    value={destinataire}
-                    onChange={(e) => setDestinataire(e.target.value)}
-                  />
-                  <button onClick={() => setOngletUp(false)} className="x top-0 right-2">
-                    &times;
-                  </button>
-                  <button onClick={envoyerETH} className="buttongreen absolute bottom-0">
-                    Envoyer
-                  </button>
+           <div className='fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50'>
+            <div className=' w-full p-5 rounded-lg max-w-md bg-gray-800'>
+              {/* header sends */}
+                <div className='flex items-center justify-between mb-7 relative'>
+                <h2 className='font-bold text-white text-2xl'>Send Crypto</h2>
+                <button
+                 className='dark:text-gray-400 dark:hover:text-gray-200 text-gray-500 hover:text-gray-700  absolute right-0 ' 
+                 onClick={() => setOngletUp(false)}>X</button>
+              </div>
+
+              <div className='space-y-10'>
+               <div className='relative'>
+                  <label className='block text-sm font-medium text-white dark:text-gray-300  text-left mb-3'>Recipient Address </label>
+                     {/* Oh shyt i might shill i bit*/}
+                    <input 
+                      type="text"
+                       value={destinataire}
+                       onChange={(e) => setDestinataire(e.target.value)}
+                       className='w-full border border-gray-300 p-4 rounded-lg pr-3'
+                        placeholder='Enter wallet address'
+                         />
+                          <span className='absolute right-0 top-1/4 translate-y-1/2'><AiOutlineQrcode className='w-9 h-9 mx-1'/></span>
+           
+                        </div>
+
+                         <div className='relative'>
+                         <label className="block font-medium text-left text-white dark:text-gray-300 mb-4">Amount</label>
+                          <input 
+                           type="text" 
+                             className='w-full p-4  pr-10 border border-gray-300 outline rounded-lg'
+                              placeholder='Amount'
+                              onChange={(e) => setMontant(e.target.value)}
+                              value={montant}
+                               />
+                               <span className='absolute right-2 top-1/2
+                                text-gray-200 translate-y-1/2'>ETH</span>
+                             </div>
+                          <div>
+                      <button 
+                      className='p-5 w-20 bg-green-600 px-4 py-2 text-white rounded-lg font-medium '
+                      >Send</button>
+                    </div>
                 </div>
               </div>
             </div>
@@ -519,54 +537,15 @@ return (
         <div>
           <span>
             <div className="onglet-container shadow bg-gray-700">
-              {mmbox === "activités" && (
-                  <div className="space-y-2 max-h-[500px] overflow-y-auto">
-                    {transactions.map((tx) => (
-                      <div key={tx.hash} className="p-3 bg-gray-800 rounded-lg">
-                        <div className="flex justify-between">
-                          <span className="text-sm text-gray-400">
-                            {tx.date}
-                          </span>
-                          <span className={`text-xs px-2 py-1 rounded ${
-                            tx.isError === "1" ? "bg-red-500" : "bg-green-500"
-                          }`}>
-                            {tx.isError === "1" ? "Échec" : "Succès"}
-                          </span>
-                        </div>
-                        
-                        <div className="mt-2">
-                          <p className="text-sm">
-                            <span className="text-gray-500">De :</span> 
-                            {`${tx.from.slice(0, 6)}...${tx.from.slice(-4)}`}
-                          </p>
-                          <p className="text-sm">
-                            <span className="text-gray-500">À :</span>
-                            {`${tx.to.slice(0, 6)}...${tx.to.slice(-4)}`}
-                          </p>
-                        </div>
-
-                        <div className="flex justify-between mt-2">
-                          <span className="font-medium">
-                            {parseFloat(tx.valueEth).toFixed(4)} ETH
-                          </span>
-                          <span className="text-gray-400 text-sm">
-                            Frais : {parseFloat(tx.gasCostEth).toFixed(6)} ETH
-                          </span>
-                        </div>
-
-                        <a 
-                          href={`https://etherscan.io/tx/${tx.hash}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="inline-block mt-2 text-blue-400 text-xs"
-                        >
-                          Voir sur Etherscan
-                        </a>
+                { mmbox === "activités" && (
+                    <div className='flex  items-center'>
+                      <h2>History : </h2>
+                       <div className='justitfy-between items-center w-full'>
+                         <div  className='bg-blue-600 rounded-lg '>
+                         </div>
+                         </div>
                       </div>
-                    ))}
-                  </div>
-
-              )}
+                )}
               {mmbox === "jetonsNFT" && (
                 <div>
                   <h4>Jetons NFT </h4>
@@ -581,7 +560,7 @@ return (
                          <img src="eth_logo.svg" alt="ethlogo" className='w-10' />
                         <a className=''>Ethereum</a>
                          </div>
-                        <a className='text-right'>0.00$</a>
+                        <span className='text-right'>{solde}</span>
                      </div>
                   </div>
                 </div>
