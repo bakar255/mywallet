@@ -10,6 +10,8 @@ import 'react-toastify/dist/ReactToastify.css';
 import { createSwapTransaction, USDC, WETH, getExchangeRate} from './components/uniswap'
  import { Token } from '@uniswap/sdk-core';
  import { AiOutlineQrcode } from "react-icons/ai";
+ import { MdOutlineClose } from "react-icons/md";
+
 
 
 const App: React.FC = () => { 
@@ -277,16 +279,24 @@ useEffect(() => {
     try {
       const provider = new BrowserProvider(window.ethereum)
       const signer = await provider.getSigner()
+     
 
       const tx = await signer.sendTransaction({
         to: destinataire,
         value: ethers.parseEther(montant)
       })
 
-      toast.success(`Transaction envoyée ! Hash: ${tx.hash}`)
-      console.log(`Transaction envoyée ! Hash: ${tx.hash}`)
+      const HashFixed = async (hash: hash) =>  {
+        return  `${hash.slice(0,5)}...${hash.slice(-4)}`;
+      } 
+
+      toast.success(`Transaction envoyée ! Hash: ${HashFixed(tx.hash)}`)
+      console.log(`Transaction envoyée ! Hash: ${HashFixed(tx.hash)}`)
+      
       const txs = await getTransactions(adresse)
       await getSolde(adresse, provider)
+      setDestinataire("");
+      setMontant("");
 
     } catch (error: any) {
       console.error("Erreur en envoyant l'ETH:", error)
@@ -304,7 +314,7 @@ useEffect(() => {
     const provider = new BrowserProvider(window.ethereum);
     const signer = await provider.getSigner();
     const userAddress = await signer.getAddress();
-
+    
     setAdresse(userAddress); 
 
     
@@ -394,8 +404,8 @@ return (
           {receiveUp && (
             <div className="popup-touch">
               <div className="popup-receive relative flex flex-col">
-                <button onClick={() => setReceiveUp(false)} className="x top-0 right-2">
-                  &times;
+                <button onClick={() => setReceiveUp(false)} className=" absolute bg-gray-500 rounded-lg top-2 p-1 right-2">
+                  <MdOutlineClose />
                 </button>
                 <p className="text-white">Receive</p>
                 <div className="qr-container flex flex-col items-center p-5">
@@ -420,15 +430,14 @@ return (
             <div className="popup-touch">
               <div className="popup-content relative">
                 <h2 className="font-bold mb-15">Swap</h2>
-                <button onClick={() => setSwapUp(false)} className="x top-0 right-2">
-                  &times;
+                <button onClick={() => setSwapUp(false)} className="bg-gray-500 p-1 top-2 rounded-lg right-2  absolute">
+                <MdOutlineClose />
                 </button>
                 <div className="justify-center items-center space-y-7">
-                  <div className="bg-gray-800 w-100 min-h-[100px] rounded-lg items-center flex space-x-0 relative">
+                  <div className="bg-gray-800 w-100 min-h-[80px] rounded-2xl items-center flex space-x-0 relative">
                     <div className="flex absolute top-0 left-0 mx-5 space-x-2">
-                      <p className="text-gray-500">Amount:</p>
                     </div>
-                    <select name="" id="" className="bg-gray-700 rounded-lg w-20 min-h-[40px]"
+                    <select name="" id="" className="bg-gray-700 rounded-lg w-18 min-h-[40px]"
                       value={tokenIn.symbol}
                        onChange={(e) => setTokenIn(e.target.value === 'WETH' ? WETH : USDC)}>
                       <option value="">WETH</option>
@@ -446,11 +455,11 @@ return (
                   <button className="cursor-pointer">
                     <img src="/swap.svg" alt="" className="w-10  rounded-full" />
                   </button>
-                  <div className="bg-gray-700 w-100 min-h-[100px] rounded-lg items-center flex space-x-0 relative">
+                  <div className="bg-gray-700 w-100 min-h-[80px] rounded-2xl items-center flex space-x-0 relative">
                     <div className="flex absolute top-0 mx-5">
-                      <p className="text-gray-500">Amount:</p>
+                      <p className="text-gray-500"></p>
                     </div>
-                    <select name="" id="" className="bg-gray-800 rounded-lg flex w-20 min-h-[40px]">
+                    <select name="" id="" className="bg-gray-800 rounded-lg flex w-18 min-h-[40px]">
                       <option value="">USDC</option>
                     </select>
                     <div className="items-center justify-between flex">
@@ -479,10 +488,10 @@ return (
                 <div className='flex items-center justify-between mb-7 relative'>
                 <h2 className='font-bold text-white text-2xl'>Send Crypto</h2>
                 <button
-                 className='dark:text-gray-400 dark:hover:text-gray-200 text-gray-500 hover:text-gray-700  absolute right-0 ' 
-                 onClick={() => setOngletUp(false)}>X</button>
-              </div>
-
+                 className=' absolute right-0' 
+                 onClick={() => setOngletUp(false)}
+                className="bg-gray-500 rounded-lg p-1" ><MdOutlineClose /></button>
+                </div>
               <div className='space-y-10'>
                <div className='relative'>
                   <label className='block text-sm font-medium text-white dark:text-gray-300  text-left mb-3'>Recipient Address </label>
@@ -491,18 +500,17 @@ return (
                       type="text"
                        value={destinataire}
                        onChange={(e) => setDestinataire(e.target.value)}
-                       className='w-full border border-gray-300 p-4 rounded-lg pr-3'
+                       className='w-full border border-gray-300 p-4 rounded-lg pr-10 '
                         placeholder='Enter wallet address'
                          />
-                          <span className='absolute right-0 top-1/4 translate-y-1/2'><AiOutlineQrcode className='w-9 h-9 mx-1'/></span>
-           
+                          <span className='absolute right-2 top-1/4 translate-y-1/2'><AiOutlineQrcode className='w-9 h-9 mx-1'/></span>
                         </div>
 
                          <div className='relative'>
                          <label className="block font-medium text-left text-white dark:text-gray-300 mb-4">Amount</label>
                           <input 
                            type="text" 
-                             className='w-full p-4  pr-10 border border-gray-300 outline rounded-lg'
+                             className='w-full p-4 pr-10 border border-gray-300 outline rounded-lg'
                               placeholder='Amount'
                               onChange={(e) => setMontant(e.target.value)}
                               value={montant}
@@ -512,7 +520,8 @@ return (
                              </div>
                           <div>
                       <button 
-                      className='p-5 w-20 bg-green-600 px-4 py-2 text-white rounded-lg font-medium '
+                      className='p-5 w-20 bg-green-600 px-4 py-2 text-white rounded-lg font-medium cursor-pointer'
+                      onClick={envoyerETH}
                       >Send</button>
                     </div>
                 </div>
@@ -539,7 +548,7 @@ return (
             <div className="onglet-container shadow bg-gray-700">
                 { mmbox === "activités" && (
                     <div className='flex  items-center'>
-                      <h2>History : </h2>
+                      <h2>History  </h2>
                        <div className='justitfy-between items-center w-full'>
                          <div  className='bg-blue-600 rounded-lg '>
                          </div>
