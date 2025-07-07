@@ -536,7 +536,7 @@ return (
               Activity
             </button>
             <button onClick={() => geremmbox("jetonsNFT")} className="tabitem">
-              Jetons NFT
+              
             </button>
             <button onClick={() => geremmbox("assets")} className="tabitem">
               Assets
@@ -546,15 +546,53 @@ return (
         <div>
           <span>
             <div className="onglet-container shadow bg-gray-700">
-                { mmbox === "activités" && (
-                    <div className='flex  items-center'>
-                      <h2>History  </h2>
-                       <div className='justitfy-between items-center w-full'>
-                         <div  className='bg-blue-600 rounded-lg '>
-                         </div>
-                         </div>
+                 {mmbox === "activités" && (
+                  <div className="space-y-2 max-h-[500px] overflow-y-auto">
+                    {transactions.map((tx) => (
+                      <div key={tx.hash} className="p-3 bg-gray-800 rounded-lg">
+                        <div className="flex justify-between">
+                          <span className="text-sm text-gray-400">
+                            {tx.date}
+                          </span>
+                          <span className={`text-xs px-2 py-1 rounded ${
+                            tx.isError === "1" ? "bg-red-500" : "bg-green-500"
+                          }`}>
+                            {tx.isError === "1" ? "Échec" : "Succès"}
+                          </span>
+                        </div>
+                        
+                        <div className="mt-2">
+                          <p className="text-sm">
+                            <span className="text-gray-500">De :</span> 
+                            {`${tx.from.slice(0, 6)}...${tx.from.slice(-4)}`}
+                          </p>
+                          <p className="text-sm">
+                            <span className="text-gray-500">À :</span>
+                            {`${tx.to.slice(0, 6)}...${tx.to.slice(-4)}`}
+                          </p>
+                        </div>
+
+                        <div className="flex justify-between mt-2">
+                          <span className="font-medium">
+                            {parseFloat(tx.valueEth).toFixed(4)} ETH
+                          </span>
+                          <span className="text-gray-400 text-sm">
+                            Frais : {parseFloat(tx.gasCostEth).toFixed(6)} ETH
+                          </span>
+                        </div>
+                        <a 
+                          href={`https://etherscan.io/tx/${tx.hash}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-block mt-2 text-blue-400 text-xs"
+                        >
+                          Show on Etherscan
+                        </a>
                       </div>
-                )}
+                    ))}
+                  </div>
+
+              )}
               {mmbox === "jetonsNFT" && (
                 <div>
                   <h4>Jetons NFT </h4>
@@ -578,7 +616,6 @@ return (
           </span>
         </div>
       </div>
-
       <div className="rounded-lg mb-10">
         <h2 className="font semi-bold leading-none text-2xl"></h2>
         <ul className="text-sm text-white space-y-2 max-h-48 overflow-y-auto"></ul>
