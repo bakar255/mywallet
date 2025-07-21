@@ -39,10 +39,10 @@ This applications was made with the framework react and a plugin-vite and tailwi
 ## Main Features
 
 QR Code: Uses a React QR code library to encode wallet addresses into a functional QR code.
-<img src="qrcode.png" alt="QR Code" width="300" />
+<img src="qrcode.PNG" alt="QR Code" width="300" />
 
 Send Interface: Allows sending funds to other addresses on the Ethereum network and require connected wallet.
-<img src="walletview.png" alt="Send Interface" width="300" />
+<img src="walletview.PNG" alt="Send Interface" width="300" />
 
 
 - Ability to switch between Ethereum Mainnet and popular testnets (Sepolia) directly from the interface.
