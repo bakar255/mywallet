@@ -116,7 +116,7 @@ export async function createSwapTransaction(
 
 export async function getExchangeRate(tokenA: Token, tokenB: Token) {
 
-  return 2076; //  1 ETH = 2076 USDC // Fictif price
+  return 3263; //  1 ETH = 2076 USDC // Fictif price
 }
 
  {/* export async function getRealRate(tokenIn: Token, tokenOut: Token, provider: ethers.Provider) {

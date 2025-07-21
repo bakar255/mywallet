@@ -36,7 +36,14 @@ npm run dev
 MyWallet is a dapp applications where you can sends funds, swap tokens in ethereum blockhain and metamask. I made a couple features to switch to mainnet and testnet via chain ID and more.
 This applications was made with the framework react and a plugin-vite and tailwindcss for the frontend interfaces. 
 
-## Features
+## Main Features
+
+QR Code: Uses a React QR code library to encode wallet addresses into a functional QR code.
+<img src="qrcode.png" alt="QR Code" width="300" />
+
+Send Interface: Allows sending funds to other addresses on the Ethereum network and require connected wallet.
+<img src="walletview.png" alt="Send Interface" width="300" />
+
 
 - Ability to switch between Ethereum Mainnet and popular testnets (Sepolia) directly from the interface.
 Detection of current chain via window.ethereum.chainId and dynamic chainChanged handling.
